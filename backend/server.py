@@ -326,6 +326,23 @@ async def clear_logs():
     result = await db.logs.delete_many({})
     return {"message": f"Deleted {result.deleted_count} log entries"}
 
+# Trades Endpoints
+@api_router.get("/trades", response_model=List[Trade])
+async def get_trades(limit: int = 100):
+    trades = await db.trades.find({}, {"_id": 0}).sort("timestamp", -1).limit(limit).to_list(limit)
+    return [Trade(**trade) for trade in trades]
+
+@api_router.post("/trades", response_model=Trade)
+async def create_trade(trade_create: TradeCreate):
+    trade_entry = Trade(**trade_create.model_dump())
+    await db.trades.insert_one(trade_entry.model_dump())
+    return trade_entry
+
+@api_router.delete("/trades")
+async def clear_trades():
+    result = await db.trades.delete_many({})
+    return {"message": f"Deleted {result.deleted_count} trade entries"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
