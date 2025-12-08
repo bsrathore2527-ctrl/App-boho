@@ -356,6 +356,59 @@ const Dashboard = () => {
             </Card>
           </TabsContent>
 
+          <TabsContent value="tradebook" data-testid="tradebook-tab">
+            <Card>
+              <CardHeader>
+                <CardTitle>Trade Book</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  {trades.length === 0 ? (
+                    <p className="text-center text-gray-500 py-8">No trades available</p>
+                  ) : (
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Instrument</th>
+                          <th className="text-center py-3 px-4 font-semibold text-gray-700">Side</th>
+                          <th className="text-center py-3 px-4 font-semibold text-gray-700">Qty</th>
+                          <th className="text-right py-3 px-4 font-semibold text-gray-700">Price</th>
+                          <th className="text-right py-3 px-4 font-semibold text-gray-700">Time</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {trades.map((trade, idx) => (
+                          <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                            <td className="py-3 px-4 text-gray-900 font-medium">{trade.instrument}</td>
+                            <td className="py-3 px-4 text-center">
+                              <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                                trade.side === 'BUY' 
+                                  ? 'bg-green-100 text-green-700' 
+                                  : 'bg-red-100 text-red-700'
+                              }`}>
+                                {trade.side}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-center text-gray-700">{trade.quantity}</td>
+                            <td className="py-3 px-4 text-right text-gray-900 font-medium">₹{trade.price.toFixed(2)}</td>
+                            <td className="py-3 px-4 text-right text-gray-600 text-xs">
+                              {new Date(trade.timestamp).toLocaleTimeString('en-IN', { 
+                                hour: '2-digit', 
+                                minute: '2-digit', 
+                                second: '2-digit',
+                                hour12: false 
+                              })}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="logs" data-testid="logs-tab">
             <Card>
               <CardHeader>
