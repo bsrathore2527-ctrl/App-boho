@@ -8,7 +8,7 @@ const StreakMeter = ({
   const displayTrades = trades.slice(-maxDisplay);
   
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+    <div className="bg-white/40 backdrop-blur-xl rounded-3xl shadow-2xl p-6 border border-white/60 hover:shadow-orange-200/50 transition-all duration-300">
       <h3 className="text-lg font-semibold mb-4 text-gray-700">Win/Loss Streak</h3>
       <div className="flex items-center gap-2 flex-wrap">
         {displayTrades.length === 0 ? (
