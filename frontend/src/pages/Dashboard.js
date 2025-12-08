@@ -155,7 +155,7 @@ const Dashboard = () => {
           </div>
           
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100 flex items-center justify-center" data-testid="losses-gauge">
+            <div className="bg-white/40 backdrop-blur-xl rounded-3xl shadow-2xl p-4 border border-white/60 flex items-center justify-center hover:shadow-orange-200/50 transition-all duration-300" data-testid="losses-gauge">
               <SmallGauge270
                 value={status?.consecutive_losses || 0}
                 max={config?.consecutive_loss_limit || 3}
@@ -164,7 +164,7 @@ const Dashboard = () => {
                 isDanger={true}
               />
             </div>
-            <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100 flex items-center justify-center" data-testid="cooldown-gauge">
+            <div className="bg-white/40 backdrop-blur-xl rounded-3xl shadow-2xl p-4 border border-white/60 flex items-center justify-center hover:shadow-orange-200/50 transition-all duration-300" data-testid="cooldown-gauge">
               <SmallGauge270
                 value={status?.cooldown_remaining_minutes || 0}
                 max={config?.cooldown_after_loss || 15}
