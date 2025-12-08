@@ -121,6 +121,26 @@ class LogEntryCreate(BaseModel):
     message: str
     details: Optional[Dict[str, Any]] = None
 
+class Trade(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: Optional[str] = None
+    timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    instrument: str = Field(description="Trading instrument symbol")
+    side: str = Field(description="BUY or SELL")
+    quantity: int = Field(description="Trade quantity")
+    price: float = Field(description="Trade price")
+    order_id: Optional[str] = None
+    status: str = Field(default="executed")
+
+class TradeCreate(BaseModel):
+    instrument: str
+    side: str
+    quantity: int
+    price: float
+    order_id: Optional[str] = None
+    status: str = "executed"
+
 # Routes
 @api_router.get("/")
 async def root():
