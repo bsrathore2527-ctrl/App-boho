@@ -98,7 +98,7 @@ const CircularGauge270 = ({
         <path
           d={describeArc(centerX, centerY, radius, startAngle, valueAngle)}
           fill="none"
-          stroke="url(#gauge-fill)"
+          stroke={fillColor}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           filter="url(#glow)"
@@ -107,36 +107,6 @@ const CircularGauge270 = ({
             transformOrigin: 'center'
           }}
         />
-        
-        {/* Indicator Ball at the end of the arc */}
-        {percentage > 0 && (() => {
-          const indicatorPos = polarToCartesian(centerX, centerY, radius, valueAngle);
-          return (
-            <>
-              {/* Outer white ring (prominent border) */}
-              <circle
-                cx={indicatorPos.x}
-                cy={indicatorPos.y}
-                r={strokeWidth / 2.2}
-                fill="white"
-                style={{ 
-                  transition: 'all 1.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                  filter: 'url(#shadow)'
-                }}
-              />
-              {/* Inner colored ball (fills the white ring) */}
-              <circle
-                cx={indicatorPos.x}
-                cy={indicatorPos.y}
-                r={strokeWidth / 3.2}
-                fill={fillColor}
-                style={{ 
-                  transition: 'all 1.5s cubic-bezier(0.4, 0, 0.2, 1)'
-                }}
-              />
-            </>
-          );
-        })()}
         
         {Array.from({ length: 10 }).map((_, i) => {
           const tickAngle = startAngle + (i * (totalAngle / 9));
