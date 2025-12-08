@@ -105,6 +105,10 @@ class RiskStatusUpdate(BaseModel):
     cooldown_remaining_minutes: Optional[int] = None
     violations: Optional[List[str]] = None
     last_trade_time: Optional[str] = None
+    peak_profit: Optional[float] = None
+    active_loss_floor: Optional[float] = None
+    trip_reason: Optional[str] = None
+    orders_allowed: Optional[bool] = None
 
 class KVStateUpdate(BaseModel):
     """Model to accept KV state data from external system"""
