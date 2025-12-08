@@ -108,6 +108,51 @@ const CircularGauge270 = ({
           }}
         />
         
+        {/* Indicator Ball at the end of the arc */}
+        {percentage > 0 && (() => {
+          const indicatorPos = polarToCartesian(centerX, centerY, radius, valueAngle);
+          return (
+            <>
+              {/* Outer glow circle */}
+              <circle
+                cx={indicatorPos.x}
+                cy={indicatorPos.y}
+                r={strokeWidth / 1.8}
+                fill={fillColor}
+                opacity="0.3"
+                style={{ 
+                  transition: 'all 1.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                  filter: 'blur(4px)'
+                }}
+              />
+              {/* Main indicator ball */}
+              <circle
+                cx={indicatorPos.x}
+                cy={indicatorPos.y}
+                r={strokeWidth / 2.5}
+                fill={fillColor}
+                stroke="white"
+                strokeWidth="3"
+                style={{ 
+                  transition: 'all 1.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                  filter: 'url(#shadow)'
+                }}
+              />
+              {/* Inner highlight */}
+              <circle
+                cx={indicatorPos.x}
+                cy={indicatorPos.y}
+                r={strokeWidth / 6}
+                fill="white"
+                opacity="0.6"
+                style={{ 
+                  transition: 'all 1.5s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
+              />
+            </>
+          );
+        })()}
+        
         {Array.from({ length: 10 }).map((_, i) => {
           const tickAngle = startAngle + (i * (totalAngle / 9));
           const isMainTick = i % 3 === 0;
