@@ -51,16 +51,6 @@ const VerticalMeter = ({
             {value}
           </div>
         </div>
-        
-        {/* Max label */}
-        <div className="absolute top-8 -right-8 text-xs text-gray-400">
-          {max}
-        </div>
-        
-        {/* Min label */}
-        <div className="absolute bottom-0 -right-6 text-xs text-gray-400">
-          0
-        </div>
       </div>
       
       <div className="mt-2 text-xs text-gray-600 uppercase text-center">
