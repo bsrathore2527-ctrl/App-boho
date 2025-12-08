@@ -66,13 +66,7 @@ const CircularGauge270 = ({
       className="relative flex items-center justify-center" 
       style={{ 
         width: size, 
-        height: size,
-        background: 'radial-gradient(circle, #ffffff 0%, #fef3c7 100%)',
-        borderRadius: '50%',
-        boxShadow: pulse 
-          ? '0 20px 60px rgba(249, 115, 22, 0.3), inset 0 0 40px rgba(249, 115, 22, 0.1)'
-          : '0 20px 60px rgba(249, 115, 22, 0.15), inset 0 0 40px rgba(249, 115, 22, 0.05)',
-        transition: 'all 0.3s ease'
+        height: size
       }}
     >
       <svg width={size} height={size} className="transform rotate-0">
