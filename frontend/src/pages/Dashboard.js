@@ -349,12 +349,14 @@ const Dashboard = () => {
                     <Label htmlFor="trailing_profit" className="text-[#B2D7E8]">Enable Trailing Profit</Label>
                     <Switch
                       id="trailing_profit"
-                      checked={configForm.trailing_profit_enabled || false}
-                      onCheckedChange={(checked) => setConfigForm({...configForm, trailing_profit_enabled: checked})}
+                      checked={configForm.trailing_profit_enabled === true}
+                      onCheckedChange={(checked) => {
+                        setConfigForm(prev => ({...prev, trailing_profit_enabled: checked}));
+                      }}
                       data-testid="switch-trailing-profit"
                     />
                   </div>
-                  {configForm.trailing_profit_enabled && (
+                  {configForm.trailing_profit_enabled === true && (
                     <div className="space-y-2">
                       <Label htmlFor="trailing_profit_step" className="text-[#B2D7E8]">Trailing Profit Step (%)</Label>
                       <Input
@@ -362,7 +364,7 @@ const Dashboard = () => {
                         type="number"
                         step="0.1"
                         value={configForm.trailing_profit_step || ''}
-                        onChange={(e) => setConfigForm({...configForm, trailing_profit_step: e.target.value})}
+                        onChange={(e) => setConfigForm(prev => ({...prev, trailing_profit_step: e.target.value}))}
                         className="bg-[#082434]/50 border-[#254B5A] text-[#B2D7E8]"
                         data-testid="input-trailing-step"
                       />
