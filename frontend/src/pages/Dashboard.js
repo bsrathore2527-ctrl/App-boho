@@ -239,21 +239,21 @@ const Dashboard = () => {
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
             <h3 className="text-lg font-semibold mb-4 text-gray-700">Trading Status</h3>
             <div className="grid grid-cols-3 gap-4 text-sm">
-              <div className="text-center p-4 rounded-lg bg-blue-50">
-                <div className="text-xs text-gray-600 mb-1">Status</div>
-                <div className="text-lg font-bold" style={{ color: status?.max_loss_hit || status?.trip_reason ? '#ef4444' : '#10b981' }}>
+              <div className="text-center p-4 rounded-lg bg-blue-50 flex flex-col justify-center min-h-[80px]">
+                <div className="text-xs text-gray-600 mb-2">Status</div>
+                <div className="text-base font-bold leading-tight" style={{ color: status?.max_loss_hit || status?.trip_reason ? '#ef4444' : '#10b981' }}>
                   {status?.max_loss_hit || status?.trip_reason ? 'TRIPPED' : 'ACTIVE'}
                 </div>
               </div>
-              <div className="text-center p-4 rounded-lg bg-orange-50">
-                <div className="text-xs text-gray-600 mb-1">New Orders</div>
-                <div className="text-lg font-bold" style={{ color: status?.orders_allowed ? '#10b981' : '#ef4444' }}>
+              <div className="text-center p-4 rounded-lg bg-orange-50 flex flex-col justify-center min-h-[80px]">
+                <div className="text-xs text-gray-600 mb-2">New Orders</div>
+                <div className="text-base font-bold leading-tight break-words" style={{ color: status?.orders_allowed ? '#10b981' : '#ef4444' }}>
                   {status?.orders_allowed ? 'ALLOWED' : 'NOT ALLOWED'}
                 </div>
               </div>
-              <div className="text-center p-4 rounded-lg bg-gray-50">
-                <div className="text-xs text-gray-600 mb-1">Trip Reason</div>
-                <div className="text-sm font-bold text-gray-700">
+              <div className="text-center p-4 rounded-lg bg-gray-50 flex flex-col justify-center min-h-[80px]">
+                <div className="text-xs text-gray-600 mb-2">Trip Reason</div>
+                <div className="text-sm font-bold text-gray-700 leading-tight break-words">
                   {status?.trip_reason || '-'}
                 </div>
               </div>
