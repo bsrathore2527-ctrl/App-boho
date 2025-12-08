@@ -286,10 +286,30 @@ const Dashboard = () => {
           <TabsContent value="config" data-testid="config-tab">
             <Card>
               <CardHeader>
-                <CardTitle>Risk Parameters</CardTitle>
+                <CardTitle>Advanced Risk Configuration</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label>Set Capital (₹)</Label>
+                    <Input
+                      type="number"
+                      value={configForm.max_position_size || ''}
+                      onChange={(e) => setConfigForm({...configForm, max_position_size: e.target.value})}
+                      placeholder="Enter trading capital"
+                      data-testid="capital-input"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Min Loss to Count (₹)</Label>
+                    <Input
+                      type="number"
+                      value={configForm.stop_loss_percentage || ''}
+                      onChange={(e) => setConfigForm({...configForm, stop_loss_percentage: e.target.value})}
+                      placeholder="Minimum loss amount"
+                      data-testid="min-loss-input"
+                    />
+                  </div>
                   <div className="space-y-2">
                     <Label>Daily Max Loss (₹)</Label>
                     <Input
@@ -304,6 +324,16 @@ const Dashboard = () => {
                       type="number"
                       value={configForm.daily_max_profit || ''}
                       onChange={(e) => setConfigForm({...configForm, daily_max_profit: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Trail Step Amount (₹)</Label>
+                    <Input
+                      type="number"
+                      value={configForm.trailing_profit_step || ''}
+                      onChange={(e) => setConfigForm({...configForm, trailing_profit_step: e.target.value})}
+                      placeholder="Enter trail step amount"
+                      data-testid="trail-step-input"
                     />
                   </div>
                   <div className="space-y-2">
@@ -346,10 +376,25 @@ const Dashboard = () => {
                       </SelectContent>
                     </Select>
                   </div>
+                  <div className="space-y-2 flex items-end">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="trailing-profit"
+                        checked={configForm.trailing_profit_enabled === true}
+                        onCheckedChange={(checked) => {
+                          setConfigForm(prev => ({...prev, trailing_profit_enabled: checked}));
+                        }}
+                      />
+                      <Label htmlFor="trailing-profit" className="cursor-pointer">Enable Trailing Profit</Label>
+                    </div>
+                  </div>
                 </div>
-                <div className="mt-6">
+                <div className="mt-6 flex gap-3">
                   <Button onClick={handleUpdateConfig} className="bg-orange-500 hover:bg-orange-600">
-                    Save Configuration
+                    Save All Configuration
+                  </Button>
+                  <Button onClick={() => fetchData()} variant="outline">
+                    Refresh
                   </Button>
                 </div>
               </CardContent>
