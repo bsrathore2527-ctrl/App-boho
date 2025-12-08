@@ -23,8 +23,8 @@ const FullCircularGauge = ({
   const lossArcDegrees = (maxLoss / totalRange) * 360;
   const profitArcDegrees = (maxProfit / totalRange) * 360;
   
-  // Center at top (0°)
-  const centerAngle = 0;
+  // Center at top (-90° in SVG coordinates)
+  const centerAngle = -90;
   const lossStartAngle = centerAngle - lossArcDegrees;
   const lossEndAngle = centerAngle;
   const profitStartAngle = centerAngle;
