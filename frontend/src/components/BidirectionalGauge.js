@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import './BidirectionalGauge.css';
 
 const BidirectionalGauge = ({ 
   realised = 0,
@@ -23,12 +24,10 @@ const BidirectionalGauge = ({
   const ratio = maxLoss / maxProfit;
   const totalDegrees = 270;
   
-  // Calculate arc angles based on ratio
   const lossArc = (maxLoss / (maxLoss + maxProfit)) * totalDegrees;
   const profitArc = (maxProfit / (maxLoss + maxProfit)) * totalDegrees;
   
-  // Starting angle (top center)
-  const centerAngle = -90; // Top center
+  const centerAngle = -90;
   const lossStartAngle = centerAngle - lossArc;
   const lossEndAngle = centerAngle;
   const profitStartAngle = centerAngle;
@@ -39,27 +38,29 @@ const BidirectionalGauge = ({
   const centerY = size / 2;
   const strokeWidth = 32;
   
-  // Futuristic colors
+  // Orange theme colors
   const colors = {
     light: {
       loss: '#ef4444',
       profit: '#10b981',
       lossGlow: 'rgba(239, 68, 68, 0.6)',
       profitGlow: 'rgba(16, 185, 129, 0.6)',
-      bg: '#1f2937',
-      text: '#ffffff',
-      textMuted: '#9ca3af',
-      track: '#374151'
+      bg: '#f3f4f6',
+      text: '#1f2937',
+      textMuted: '#6b7280',
+      track: '#e5e7eb',
+      accent: '#f97316'
     },
     dark: {
-      loss: '#ff0844',
-      profit: '#00ff88',
-      lossGlow: 'rgba(255, 8, 68, 0.8)',
-      profitGlow: 'rgba(0, 255, 136, 0.8)',
+      loss: '#ef4444',
+      profit: '#10b981',
+      lossGlow: 'rgba(239, 68, 68, 0.8)',
+      profitGlow: 'rgba(16, 185, 129, 0.8)',
       bg: '#0a0a0f',
-      text: '#00ff88',
-      textMuted: '#4a5568',
-      track: '#1a1a2e'
+      text: '#f97316',
+      textMuted: '#9ca3af',
+      track: '#1a1a2e',
+      accent: '#f97316'
     }
   };
   
@@ -70,7 +71,6 @@ const BidirectionalGauge = ({
   const maxValue = isProfit ? maxProfit : maxLoss;
   const percentage = Math.min((absTotal / maxValue) * 100, 100);
   
-  // Calculate fill angle
   let fillAngle;
   if (isProfit) {
     fillAngle = centerAngle + (percentage / 100) * profitArc;
@@ -96,7 +96,6 @@ const BidirectionalGauge = ({
     ].join(' ');
   };
   
-  // Generate trail step marks
   const generateStepMarks = (isLoss) => {
     const marks = [];
     const max = isLoss ? maxLoss : maxProfit;
@@ -143,32 +142,29 @@ const BidirectionalGauge = ({
   
   return (
     <div 
-      className="relative flex items-center justify-center" 
+      className="relative flex items-center justify-center bidirectional-gauge" 
       style={{ 
         width: size, 
         height: size,
-        background: isDark ? 'radial-gradient(circle, #1a1a2e 0%, #0a0a0f 100%)' : 'radial-gradient(circle, #2d3748 0%, #1a202c 100%)',
+        background: isDark ? 'radial-gradient(circle, #1a1a2e 0%, #0a0a0f 100%)' : 'radial-gradient(circle, #ffffff 0%, #f9fafb 100%)',
         borderRadius: '50%',
         boxShadow: isDark 
-          ? '0 0 40px rgba(0, 255, 136, 0.2), inset 0 0 60px rgba(0, 0, 0, 0.5)'
-          : '0 20px 60px rgba(0, 0, 0, 0.4), inset 0 0 40px rgba(0, 0, 0, 0.3)'
+          ? '0 0 40px rgba(249, 115, 22, 0.2), inset 0 0 60px rgba(0, 0, 0, 0.5)'
+          : '0 20px 60px rgba(0, 0, 0, 0.15), inset 0 0 40px rgba(0, 0, 0, 0.05)'
       }}
     >
       <svg width={size} height={size} className="transform rotate-0">
         <defs>
-          {/* Loss gradient */}
           <linearGradient id="loss-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" style={{ stopColor: theme.loss, stopOpacity: 0.6 }} />
             <stop offset="100%" style={{ stopColor: theme.loss, stopOpacity: 1 }} />
           </linearGradient>
           
-          {/* Profit gradient */}
           <linearGradient id="profit-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" style={{ stopColor: theme.profit, stopOpacity: 1 }} />
             <stop offset="100%" style={{ stopColor: theme.profit, stopOpacity: 0.6 }} />
           </linearGradient>
           
-          {/* Glow filters */}
           <filter id="loss-glow">
             <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
             <feMerge>
@@ -184,19 +180,8 @@ const BidirectionalGauge = ({
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
           </filter>
-          
-          {/* Pulsing animation */}
-          <filter id="pulse-glow">
-            <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
-            <feMerge>
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
         </defs>
         
-        {/* Background track - Loss side */}
         <path
           d={describeArc(centerX, centerY, radius, lossStartAngle, lossEndAngle)}
           fill="none"
@@ -206,7 +191,6 @@ const BidirectionalGauge = ({
           opacity="0.3"
         />
         
-        {/* Background track - Profit side */}
         <path
           d={describeArc(centerX, centerY, radius, profitStartAngle, profitEndAngle)}
           fill="none"
@@ -216,20 +200,17 @@ const BidirectionalGauge = ({
           opacity="0.3"
         />
         
-        {/* Trail step marks */}
         {generateStepMarks(true)}
         {generateStepMarks(false)}
         
-        {/* Center point indicator */}
         <circle
           cx={polarToCartesian(centerX, centerY, radius, centerAngle).x}
           cy={polarToCartesian(centerX, centerY, radius, centerAngle).y}
           r="6"
-          fill={theme.text}
+          fill={theme.accent}
           opacity="0.8"
         />
         
-        {/* Active arc */}
         {isProfit ? (
           <path
             d={describeArc(centerX, centerY, radius, profitStartAngle, fillAngle)}
@@ -238,10 +219,7 @@ const BidirectionalGauge = ({
             strokeWidth={strokeWidth}
             strokeLinecap="round"
             filter="url(#profit-glow)"
-            style={{ 
-              transition: 'all 1.5s cubic-bezier(0.4, 0, 0.2, 1)',
-              animation: isDark ? 'pulse 2s ease-in-out infinite' : 'none'
-            }}
+            className="gauge-arc"
           />
         ) : (
           <path
@@ -251,14 +229,10 @@ const BidirectionalGauge = ({
             strokeWidth={strokeWidth}
             strokeLinecap="round"
             filter="url(#loss-glow)"
-            style={{ 
-              transition: 'all 1.5s cubic-bezier(0.4, 0, 0.2, 1)',
-              animation: isDark ? 'pulse 2s ease-in-out infinite' : 'none'
-            }}
+            className="gauge-arc"
           />
         )}
         
-        {/* Max Loss label */}
         <text
           x={polarToCartesian(centerX, centerY, radius + strokeWidth/2 + 40, lossStartAngle).x}
           y={polarToCartesian(centerX, centerY, radius + strokeWidth/2 + 40, lossStartAngle).y}
@@ -266,12 +240,10 @@ const BidirectionalGauge = ({
           fontSize="14"
           fontWeight="700"
           textAnchor="middle"
-          style={{ filter: isDark ? 'drop-shadow(0 0 8px rgba(255, 8, 68, 0.8))' : 'none' }}
         >
           -₹{maxLoss}
         </text>
         
-        {/* Max Profit label */}
         <text
           x={polarToCartesian(centerX, centerY, radius + strokeWidth/2 + 40, profitEndAngle).x}
           y={polarToCartesian(centerX, centerY, radius + strokeWidth/2 + 40, profitEndAngle).y}
@@ -279,24 +251,19 @@ const BidirectionalGauge = ({
           fontSize="14"
           fontWeight="700"
           textAnchor="middle"
-          style={{ filter: isDark ? 'drop-shadow(0 0 8px rgba(0, 255, 136, 0.8))' : 'none' }}
         >
           +₹{maxProfit}
         </text>
       </svg>
       
-      {/* Center content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <div className="text-center">
           <div 
             className="text-6xl font-bold mb-3" 
             style={{ 
               color: isProfit ? theme.profit : theme.loss,
-              fontFamily: 'Orbitron, Manrope, sans-serif',
-              textShadow: isDark 
-                ? `0 0 20px ${isProfit ? theme.profitGlow : theme.lossGlow}, 0 0 40px ${isProfit ? theme.profitGlow : theme.lossGlow}`
-                : '0 4px 8px rgba(0,0,0,0.3)',
-              animation: isDark ? 'textPulse 2s ease-in-out infinite' : 'none'
+              fontFamily: 'Manrope, sans-serif',
+              textShadow: '0 4px 8px rgba(0,0,0,0.1)'
             }}
           >
             {isProfit ? '+' : '-'}₹{absTotal.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
@@ -311,10 +278,7 @@ const BidirectionalGauge = ({
             <div className="text-center">
               <div 
                 className="font-bold text-lg"
-                style={{ 
-                  color: realised >= 0 ? theme.profit : theme.loss,
-                  textShadow: isDark ? `0 0 10px ${realised >= 0 ? theme.profitGlow : theme.lossGlow}` : 'none'
-                }}
+                style={{ color: realised >= 0 ? theme.profit : theme.loss }}
               >
                 {realised >= 0 ? '+' : ''}₹{realised.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
               </div>
@@ -323,10 +287,7 @@ const BidirectionalGauge = ({
             <div className="text-center">
               <div 
                 className="font-bold text-lg"
-                style={{ 
-                  color: unrealised >= 0 ? theme.profit : theme.loss,
-                  textShadow: isDark ? `0 0 10px ${unrealised >= 0 ? theme.profitGlow : theme.lossGlow}` : 'none'
-                }}
+                style={{ color: unrealised >= 0 ? theme.profit : theme.loss }}
               >
                 {unrealised >= 0 ? '+' : ''}₹{unrealised.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
               </div>
@@ -335,26 +296,6 @@ const BidirectionalGauge = ({
           </div>
         </div>
       </div>
-      
-      <style jsx>{`
-        @keyframes pulse {
-          0%, 100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.7;
-          }
-        }
-        
-        @keyframes textPulse {
-          0%, 100% {
-            transform: scale(1);
-          }
-          50% {
-            transform: scale(1.02);
-          }
-        }
-      `}</style>
     </div>
   );
 };
