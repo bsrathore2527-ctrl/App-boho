@@ -9,11 +9,19 @@ const CircularGauge270 = ({
   size = 320
 }) => {
   const [animatedValue, setAnimatedValue] = useState(0);
+  const [pulse, setPulse] = useState(false);
   
   useEffect(() => {
     const timer = setTimeout(() => {
       setAnimatedValue(total);
     }, 100);
+    return () => clearTimeout(timer);
+  }, [total]);
+
+  useEffect(() => {
+    // Pulse effect when value changes
+    setPulse(true);
+    const timer = setTimeout(() => setPulse(false), 600);
     return () => clearTimeout(timer);
   }, [total]);
 
@@ -53,11 +61,20 @@ const CircularGauge270 = ({
     ].join(' ');
   };
   
-  const maxLossPos = polarToCartesian(centerX, centerY, radius + 45, startAngle);
-  const maxProfitPos = polarToCartesian(centerX, centerY, radius + 45, endAngle);
-  
   return (
-    <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+    <div 
+      className="relative flex items-center justify-center" 
+      style={{ 
+        width: size, 
+        height: size,
+        background: 'radial-gradient(circle, #ffffff 0%, #fef3c7 100%)',
+        borderRadius: '50%',
+        boxShadow: pulse 
+          ? '0 20px 60px rgba(249, 115, 22, 0.3), inset 0 0 40px rgba(249, 115, 22, 0.1)'
+          : '0 20px 60px rgba(249, 115, 22, 0.15), inset 0 0 40px rgba(249, 115, 22, 0.05)',
+        transition: 'all 0.3s ease'
+      }}
+    >
       <svg width={size} height={size} className="transform rotate-0">
         <defs>
           <linearGradient id="gauge-fill" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -66,6 +83,13 @@ const CircularGauge270 = ({
           </linearGradient>
           <filter id="shadow">
             <feDropShadow dx="0" dy="2" stdDeviation="4" floodOpacity="0.2"/>
+          </filter>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
           </filter>
         </defs>
         
@@ -83,7 +107,7 @@ const CircularGauge270 = ({
           stroke="url(#gauge-fill)"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
-          filter="url(#shadow)"
+          filter="url(#glow)"
           style={{ 
             transition: 'all 1.5s cubic-bezier(0.4, 0, 0.2, 1)',
             transformOrigin: 'center'
@@ -112,12 +136,20 @@ const CircularGauge270 = ({
             />
           );
         })}
-        
       </svg>
       
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <div className="text-center">
-          <div className="text-5xl font-bold mb-2" style={{ color: fillColor, fontFamily: 'Manrope, sans-serif' }}>
+          <div 
+            className="text-5xl font-bold mb-2" 
+            style={{ 
+              color: fillColor, 
+              fontFamily: 'Manrope, sans-serif',
+              textShadow: '0 4px 8px rgba(0,0,0,0.1)',
+              transform: pulse ? 'scale(1.05)' : 'scale(1)',
+              transition: 'transform 0.3s ease'
+            }}
+          >
             {isProfit ? '+' : '-'}₹{absTotal.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
           </div>
           <div className="text-sm text-gray-500 uppercase tracking-wide mb-3">Total P&L</div>

@@ -12,7 +12,7 @@ const VerticalMeter = ({
   
   const height = size;
   const width = 60;
-  const fillHeight = (percentage / 100) * (height - 60);
+  const fillHeight = (percentage / 100) * (height - 40);
   
   return (
     <div className="flex flex-col items-center" style={{ width: width + 40 }}>
@@ -20,7 +20,7 @@ const VerticalMeter = ({
         {/* Background bar */}
         <div 
           className="absolute bottom-0 left-1/2 transform -translate-x-1/2"
-          style={{
+          style={{{
             width: 24,
             height: height - 40,
             background: '#f3f4f6',
@@ -28,9 +28,9 @@ const VerticalMeter = ({
           }}
         />
         
-        {/* Fill bar */}
+        {/* Fill bar - fixed to start from bottom */}
         <div 
-          className="absolute bottom-5 left-1/2 transform -translate-x-1/2 transition-all duration-1000"
+          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 transition-all duration-1000"
           style={{
             width: 24,
             height: fillHeight,
