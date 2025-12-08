@@ -113,38 +113,23 @@ const CircularGauge270 = ({
           const indicatorPos = polarToCartesian(centerX, centerY, radius, valueAngle);
           return (
             <>
-              {/* Outer glow circle */}
+              {/* Outer white ring (prominent border) */}
               <circle
                 cx={indicatorPos.x}
                 cy={indicatorPos.y}
-                r={strokeWidth / 1.8}
-                fill={fillColor}
-                opacity="0.3"
-                style={{ 
-                  transition: 'all 1.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                  filter: 'blur(4px)'
-                }}
-              />
-              {/* Main indicator ball */}
-              <circle
-                cx={indicatorPos.x}
-                cy={indicatorPos.y}
-                r={strokeWidth / 2.5}
-                fill={fillColor}
-                stroke="white"
-                strokeWidth="3"
+                r={strokeWidth / 2.2}
+                fill="white"
                 style={{ 
                   transition: 'all 1.5s cubic-bezier(0.4, 0, 0.2, 1)',
                   filter: 'url(#shadow)'
                 }}
               />
-              {/* Inner highlight */}
+              {/* Inner colored ball (fills the white ring) */}
               <circle
                 cx={indicatorPos.x}
                 cy={indicatorPos.y}
-                r={strokeWidth / 6}
-                fill="white"
-                opacity="0.6"
+                r={strokeWidth / 3.2}
+                fill={fillColor}
                 style={{ 
                   transition: 'all 1.5s cubic-bezier(0.4, 0, 0.2, 1)'
                 }}
