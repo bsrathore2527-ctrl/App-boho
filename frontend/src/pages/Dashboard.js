@@ -387,7 +387,7 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="tradebook" data-testid="tradebook-tab">
-            <Card>
+            <Card className="bg-white/40 backdrop-blur-xl border-white/60 shadow-2xl">
               <CardHeader>
                 <CardTitle>Trade Book</CardTitle>
               </CardHeader>
