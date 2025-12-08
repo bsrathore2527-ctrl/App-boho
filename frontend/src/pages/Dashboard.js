@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import { Shield, User, Settings, RotateCcw, Square, XCircle, DollarSign, TrendingDown } from "lucide-react";
+import { Shield, User, Settings, RotateCcw, Square, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CircularGauge270 from "@/components/CircularGauge270";
 import SmallGauge270 from "@/components/SmallGauge270";
+import VerticalMeter from "@/components/VerticalMeter";
+import StreakMeter from "@/components/StreakMeter";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
