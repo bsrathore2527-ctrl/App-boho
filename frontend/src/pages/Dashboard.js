@@ -207,25 +207,55 @@ const Dashboard = () => {
           <StreakMeter trades={tradeHistory} maxDisplay={20} />
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 mb-8">
-          <h3 className="text-lg font-semibold mb-4 text-gray-700">Risk Limits Summary</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div className="text-center p-4 rounded-lg bg-red-50">
-              <div className="text-xs text-gray-600 mb-1">Max Loss</div>
-              <div className="text-lg font-bold text-red-600">₹{config?.daily_max_loss?.toLocaleString()}</div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+            <h3 className="text-lg font-semibold mb-4 text-gray-700">Key Metrics</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="text-center p-4 rounded-lg bg-green-50">
+                <div className="text-xs text-gray-600 mb-1">Peak Profit</div>
+                <div className="text-lg font-bold text-green-600">₹{status?.peak_profit?.toLocaleString() || '0'}</div>
+              </div>
+              <div className="text-center p-4 rounded-lg bg-blue-50">
+                <div className="text-xs text-gray-600 mb-1">Active Loss Floor</div>
+                <div className="text-lg font-bold text-blue-600">₹{status?.active_loss_floor?.toLocaleString() || '0'}</div>
+              </div>
+              <div className="text-center p-4 rounded-lg bg-red-50">
+                <div className="text-xs text-gray-600 mb-1">Remaining to Max Loss</div>
+                <div className="text-lg font-bold text-red-600">
+                  ₹{((config?.daily_max_loss || 0) - Math.abs(status?.total_pnl || 0) < 0 ? 0 : (config?.daily_max_loss || 0) + (status?.total_pnl || 0)).toLocaleString()}
+                </div>
+              </div>
+              <div className="text-center p-4 rounded-lg bg-purple-50">
+                <div className="text-xs text-gray-600 mb-1">Last Trade Time</div>
+                <div className="text-sm font-bold text-purple-600">
+                  {status?.last_trade_time 
+                    ? new Date(status.last_trade_time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
+                    : 'N/A'}
+                </div>
+              </div>
             </div>
-            <div className="text-center p-4 rounded-lg bg-green-50">
-              <div className="text-xs text-gray-600 mb-1">Max Profit</div>
-              <div className="text-lg font-bold text-green-600">₹{config?.daily_max_profit?.toLocaleString()}</div>
-            </div>
-            <div className="text-center p-4 rounded-lg bg-orange-50">
-              <div className="text-xs text-gray-600 mb-1">Trades Today</div>
-              <div className="text-lg font-bold text-orange-600">{status?.trades_today || 0} / {config?.max_trades_per_day}</div>
-            </div>
-            <div className="text-center p-4 rounded-lg bg-blue-50">
-              <div className="text-xs text-gray-600 mb-1">Status</div>
-              <div className="text-lg font-bold" style={{ color: status?.max_loss_hit ? '#ef4444' : '#10b981' }}>
-                {status?.max_loss_hit ? 'LOCKED' : status?.in_cooldown ? 'COOLDOWN' : 'ACTIVE'}
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+            <h3 className="text-lg font-semibold mb-4 text-gray-700">Trading Status</h3>
+            <div className="grid grid-cols-3 gap-4 text-sm">
+              <div className="text-center p-4 rounded-lg bg-blue-50">
+                <div className="text-xs text-gray-600 mb-1">Status</div>
+                <div className="text-lg font-bold" style={{ color: status?.max_loss_hit || status?.trip_reason ? '#ef4444' : '#10b981' }}>
+                  {status?.max_loss_hit || status?.trip_reason ? 'TRIPPED' : 'ACTIVE'}
+                </div>
+              </div>
+              <div className="text-center p-4 rounded-lg bg-orange-50">
+                <div className="text-xs text-gray-600 mb-1">New Orders</div>
+                <div className="text-lg font-bold" style={{ color: status?.orders_allowed ? '#10b981' : '#ef4444' }}>
+                  {status?.orders_allowed ? 'ALLOWED' : 'NOT ALLOWED'}
+                </div>
+              </div>
+              <div className="text-center p-4 rounded-lg bg-gray-50">
+                <div className="text-xs text-gray-600 mb-1">Trip Reason</div>
+                <div className="text-sm font-bold text-gray-700">
+                  {status?.trip_reason || '-'}
+                </div>
               </div>
             </div>
           </div>
