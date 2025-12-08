@@ -20,7 +20,7 @@ const VerticalMeter = ({
         {/* Background bar */}
         <div 
           className="absolute bottom-0 left-1/2 transform -translate-x-1/2"
-          style={{{
+          style={{
             width: 24,
             height: height - 40,
             background: '#f3f4f6',
