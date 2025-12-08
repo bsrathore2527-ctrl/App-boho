@@ -141,14 +141,13 @@ const Dashboard = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           <div className="lg:col-span-2 flex justify-center items-center bg-white rounded-2xl shadow-lg p-8 border border-gray-100" data-testid="main-pnl-gauge">
-            <FullCircularGauge
+            <CircularGauge270
               realised={status?.realised || 0}
               unrealised={status?.unrealised || 0}
               total={status?.total_pnl || 0}
               maxLoss={config?.daily_max_loss || 5000}
               maxProfit={config?.daily_max_profit || 5000}
-              trailStep={config?.trailing_profit_step || 1000}
-              size={420}
+              size={380}
             />
           </div>
           
