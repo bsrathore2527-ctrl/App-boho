@@ -23,7 +23,17 @@ const Dashboard = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [configForm, setConfigForm] = useState({});
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // Mock login state
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [tradeHistory, setTradeHistory] = useState([
+    { type: 'profit', amount: 150 },
+    { type: 'profit', amount: 200 },
+    { type: 'loss', amount: -50 },
+    { type: 'profit', amount: 300 },
+    { type: 'loss', amount: -100 },
+    { type: 'profit', amount: 180 },
+    { type: 'profit', amount: 250 },
+    { type: 'loss', amount: -75 },
+  ]);
 
   const fetchData = async () => {
     try {
