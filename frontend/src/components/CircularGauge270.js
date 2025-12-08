@@ -53,7 +53,6 @@ const CircularGauge270 = ({
     ].join(' ');
   };
   
-  // Calculate positions for max loss and max profit labels
   const maxLossPos = polarToCartesian(centerX, centerY, radius + 45, startAngle);
   const maxProfitPos = polarToCartesian(centerX, centerY, radius + 45, endAngle);
   
@@ -70,7 +69,6 @@ const CircularGauge270 = ({
           </filter>
         </defs>
         
-        {/* Background arc */}
         <path
           d={describeArc(centerX, centerY, radius, startAngle, endAngle)}
           fill="none"
@@ -79,7 +77,6 @@ const CircularGauge270 = ({
           strokeLinecap="round"
         />
         
-        {/* Value arc with animation */}
         <path
           d={describeArc(centerX, centerY, radius, startAngle, valueAngle)}
           fill="none"
@@ -93,7 +90,6 @@ const CircularGauge270 = ({
           }}
         />
         
-        {/* Tick marks */}
         {Array.from({ length: 10 }).map((_, i) => {
           const tickAngle = startAngle + (i * (totalAngle / 9));
           const isMainTick = i % 3 === 0;
@@ -117,7 +113,6 @@ const CircularGauge270 = ({
           );
         })}
         
-        {/* Max Loss label */}
         <text
           x={maxLossPos.x}
           y={maxLossPos.y}
@@ -138,7 +133,6 @@ const CircularGauge270 = ({
           Max Loss
         </text>
         
-        {/* Max Profit label */}
         <text
           x={maxProfitPos.x}
           y={maxProfitPos.y}
@@ -160,7 +154,6 @@ const CircularGauge270 = ({
         </text>
       </svg>
       
-      {/* Center content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <div className="text-center">
           <div className="text-5xl font-bold mb-2" style={{ color: fillColor, fontFamily: 'Manrope, sans-serif' }}>
