@@ -236,6 +236,9 @@ const Dashboard = () => {
             <TabsTrigger value="config" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
               Advanced Config
             </TabsTrigger>
+            <TabsTrigger value="tradebook" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
+              Tradebook
+            </TabsTrigger>
             <TabsTrigger value="logs" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
               Logs
             </TabsTrigger>
