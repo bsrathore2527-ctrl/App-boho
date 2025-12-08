@@ -239,6 +239,21 @@ async def reset_risk_status():
     )
     await db.logs.insert_one(log_entry.model_dump())
     
+    # Add some sample trades if none exist
+    trade_count = await db.trades.count_documents({})
+    if trade_count == 0:
+        sample_trades = [
+            Trade(instrument="NIFTY25D09257700PE", side="BUY", quantity=75, price=3.15, timestamp=(datetime.now(timezone.utc).replace(hour=13, minute=1, second=41)).isoformat()),
+            Trade(instrument="NIFTY25D16256600PE", side="BUY", quantity=75, price=17.7, timestamp=(datetime.now(timezone.utc).replace(hour=11, minute=46, second=41)).isoformat()),
+            Trade(instrument="NIFTY25D16256600PE", side="SELL", quantity=75, price=17.4, timestamp=(datetime.now(timezone.utc).replace(hour=11, minute=34, second=33)).isoformat()),
+            Trade(instrument="NIFTY25D16256600PE", side="BUY", quantity=75, price=17.45, timestamp=(datetime.now(timezone.utc).replace(hour=11, minute=34, second=28)).isoformat()),
+            Trade(instrument="NIFTY25D16256600PE", side="SELL", quantity=75, price=16.7, timestamp=(datetime.now(timezone.utc).replace(hour=10, minute=34, second=33)).isoformat()),
+            Trade(instrument="NIFTY25D16256600PE", side="BUY", quantity=75, price=15.8, timestamp=(datetime.now(timezone.utc).replace(hour=10, minute=23, second=7)).isoformat()),
+            Trade(instrument="NIFTY25D16256600PE", side="SELL", quantity=75, price=15.6, timestamp=(datetime.now(timezone.utc).replace(hour=10, minute=15, second=34)).isoformat()),
+            Trade(instrument="NIFTY25D16256600PE", side="BUY", quantity=75, price=13.65, timestamp=(datetime.now(timezone.utc).replace(hour=9, minute=15, second=23)).isoformat()),
+        ]
+        await db.trades.insert_many([trade.model_dump() for trade in sample_trades])
+    
     return {"message": "Risk status reset successfully"}
 
 # KV State Sync Endpoint
