@@ -9,13 +9,14 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import CircularGauge270 from "@/components/CircularGauge270";
+import BidirectionalGauge from "@/components/BidirectionalGauge";
 import SmallGauge270 from "@/components/SmallGauge270";
 import VerticalMeter from "@/components/VerticalMeter";
 import StreakMeter from "@/components/StreakMeter";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
+const THEME = process.env.REACT_APP_THEME || 'light';
 
 const Dashboard = () => {
   const [config, setConfig] = useState(null);
@@ -23,7 +24,7 @@ const Dashboard = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [configForm, setConfigForm] = useState({});
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isDarkTheme, setIsDarkTheme] = useState(THEME === 'dark');
   const [tradeHistory, setTradeHistory] = useState([
     { type: 'profit', amount: 150 },
     { type: 'profit', amount: 200 },
@@ -102,33 +103,51 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: isDarkTheme ? '#0a0a0f' : '#ffffff' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg">Loading dashboard...</p>
+          <div 
+            className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
+            style={{ borderColor: isDarkTheme ? '#00ff88' : '#f97316' }}
+          ></div>
+          <p className="text-lg" style={{ color: isDarkTheme ? '#00ff88' : '#6b7280' }}>Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
+  const bgColor = isDarkTheme ? '#0a0a0f' : '#ffffff';
+  const headerBg = isDarkTheme ? '#1a1a2e' : '#ffffff';
+  const textColor = isDarkTheme ? '#00ff88' : '#1f2937';
+  const mutedColor = isDarkTheme ? '#4a5568' : '#6b7280';
+  const primaryColor = isDarkTheme ? '#00ff88' : '#f97316';
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen" style={{ background: isDarkTheme ? 'linear-gradient(180deg, #0a0a0f 0%, #1a1a2e 100%)' : '#f9fafb' }}>
       {/* Header */}
-      <header className="border-b border-gray-200 bg-white shadow-sm">
+      <header className="border-b shadow-sm" style={{ borderColor: isDarkTheme ? '#1a1a2e' : '#e5e7eb', backgroundColor: headerBg }}>
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Shield className="h-8 w-8 text-orange-500" />
+              <Shield className="h-8 w-8" style={{ color: primaryColor }} />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Manrope, sans-serif' }}>BOHO Risk Manager</h1>
-                <p className="text-sm text-gray-500">Professional Trading Discipline</p>
+                <h1 className="text-2xl font-bold" style={{ color: textColor, fontFamily: isDarkTheme ? 'Orbitron, sans-serif' : 'Manrope, sans-serif' }}>BOHO Risk Manager</h1>
+                <p className="text-sm" style={{ color: mutedColor }}>Professional Trading Discipline</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Button 
                 variant="outline" 
                 size="sm"
-                className="border-orange-500 text-orange-600 hover:bg-orange-50"
+                style={{ borderColor: primaryColor, color: primaryColor }}
+                className="hover:bg-opacity-10"
+                onClick={() => setIsDarkTheme(!isDarkTheme)}
+              >
+                {isDarkTheme ? '☀️' : '🌙'} Theme
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                style={{ borderColor: primaryColor, color: primaryColor }}
                 data-testid="login-btn"
               >
                 <User className="h-4 w-4 mr-2" />
@@ -144,7 +163,8 @@ const Dashboard = () => {
         <div className="flex flex-wrap gap-3 mb-8">
           <Button 
             onClick={handleResetDay}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="text-white"
+            style={{ backgroundColor: isDarkTheme ? '#0066ff' : '#3b82f6' }}
             data-testid="reset-day-btn"
           >
             <RotateCcw className="h-4 w-4 mr-2" />
@@ -152,7 +172,8 @@ const Dashboard = () => {
           </Button>
           <Button 
             onClick={handleKill}
-            className="bg-red-600 hover:bg-red-700 text-white"
+            className="text-white"
+            style={{ backgroundColor: isDarkTheme ? '#ff0844' : '#ef4444' }}
             data-testid="kill-btn"
           >
             <Square className="h-4 w-4 mr-2" />
@@ -160,7 +181,8 @@ const Dashboard = () => {
           </Button>
           <Button 
             onClick={handleCancelAll}
-            className="bg-yellow-600 hover:bg-yellow-700 text-white"
+            className="text-white"
+            style={{ backgroundColor: isDarkTheme ? '#ffaa00' : '#eab308' }}
             data-testid="cancel-all-btn"
           >
             <XCircle className="h-4 w-4 mr-2" />
@@ -168,7 +190,7 @@ const Dashboard = () => {
           </Button>
           <Button 
             variant="outline"
-            className="border-gray-300 text-gray-700 hover:bg-gray-50"
+            style={{ borderColor: mutedColor, color: mutedColor }}
             data-testid="config-btn"
           >
             <Settings className="h-4 w-4 mr-2" />
@@ -176,48 +198,46 @@ const Dashboard = () => {
           </Button>
         </div>
 
-        {/* Gauges Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Main P&L Gauge */}
-          <div className="lg:col-span-2 flex justify-center items-center bg-white rounded-2xl shadow-lg p-8 border border-gray-100" data-testid="main-pnl-gauge">
-            <CircularGauge270
-              realised={status?.realised || 0}
-              unrealised={status?.unrealised || 0}
-              total={status?.total_pnl || 0}
-              maxLoss={config?.daily_max_loss || 5000}
-              maxProfit={config?.daily_max_profit || 10000}
-              size={380}
+        {/* Main Bidirectional Gauge */}
+        <div className="flex justify-center items-center mb-8" data-testid="main-gauge">
+          <BidirectionalGauge
+            realised={status?.realised || 0}
+            unrealised={status?.unrealised || 0}
+            total={status?.total_pnl || 0}
+            maxLoss={config?.daily_max_loss || 500}
+            maxProfit={config?.daily_max_profit || 500}
+            trailStep={config?.trailing_profit_step || 250}
+            size={480}
+            isDark={isDarkTheme}
+          />
+        </div>
+
+        {/* Small Gauges */}
+        <div className="grid grid-cols-2 gap-6 mb-8 max-w-2xl mx-auto">
+          <div className="rounded-2xl shadow-lg p-4 border flex items-center justify-center" style={{ backgroundColor: isDarkTheme ? '#1a1a2e' : '#ffffff', borderColor: isDarkTheme ? '#2d3748' : '#e5e7eb' }} data-testid="losses-gauge">
+            <SmallGauge270
+              value={status?.consecutive_losses || 0}
+              max={config?.consecutive_loss_limit || 3}
+              label="Consecutive Losses"
+              size={160}
+              isDanger={true}
             />
           </div>
-          
-          {/* Small Gauges */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 gap-4">
-            <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100 flex items-center justify-center" data-testid="losses-gauge">
-              <SmallGauge270
-                value={status?.consecutive_losses || 0}
-                max={config?.consecutive_loss_limit || 3}
-                label="Consecutive Losses"
-                size={160}
-                isDanger={true}
-              />
-            </div>
-            <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100 flex items-center justify-center" data-testid="cooldown-gauge">
-              <SmallGauge270
-                value={status?.cooldown_remaining_minutes || 0}
-                max={config?.cooldown_after_loss || 15}
-                label="Cooldown (mins)"
-                size={160}
-                isDanger={false}
-              />
-            </div>
+          <div className="rounded-2xl shadow-lg p-4 border flex items-center justify-center" style={{ backgroundColor: isDarkTheme ? '#1a1a2e' : '#ffffff', borderColor: isDarkTheme ? '#2d3748' : '#e5e7eb' }} data-testid="cooldown-gauge">
+            <SmallGauge270
+              value={status?.cooldown_remaining_minutes || 0}
+              max={config?.cooldown_after_loss || 15}
+              label="Cooldown (mins)"
+              size={160}
+              isDanger={false}
+            />
           </div>
         </div>
 
         {/* Vertical Meters and Streak */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Vertical Meters */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-            <h3 className="text-lg font-semibold mb-6 text-gray-700">Performance Metrics</h3>
+          <div className="rounded-2xl shadow-lg p-6 border" style={{ backgroundColor: isDarkTheme ? '#1a1a2e' : '#ffffff', borderColor: isDarkTheme ? '#2d3748' : '#e5e7eb' }}>
+            <h3 className="text-lg font-semibold mb-6" style={{ color: textColor }}>Performance Metrics</h3>
             <div className="flex justify-around items-end">
               <VerticalMeter
                 value={status?.trades_today || 0}
@@ -243,133 +263,135 @@ const Dashboard = () => {
             </div>
           </div>
           
-          {/* Streak Meter */}
-          <StreakMeter trades={tradeHistory} maxDisplay={20} />
+          <div style={{ backgroundColor: isDarkTheme ? '#1a1a2e' : '#ffffff', borderColor: isDarkTheme ? '#2d3748' : '#e5e7eb' }}>
+            <StreakMeter trades={tradeHistory} maxDisplay={20} />
+          </div>
         </div>
 
-        {/* Risk Summary Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 mb-8">
-          <h3 className="text-lg font-semibold mb-4 text-gray-700">Risk Limits Summary</h3>
+        {/* Risk Summary */}
+        <div className="rounded-2xl shadow-lg p-6 border mb-8" style={{ backgroundColor: isDarkTheme ? '#1a1a2e' : '#ffffff', borderColor: isDarkTheme ? '#2d3748' : '#e5e7eb' }}>
+          <h3 className="text-lg font-semibold mb-4" style={{ color: textColor }}>Risk Limits Summary</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div className="text-center p-4 rounded-lg bg-red-50">
-              <div className="text-xs text-gray-600 mb-1">Max Loss</div>
-              <div className="text-lg font-bold text-red-600">₹{config?.daily_max_loss?.toLocaleString()}</div>
+            <div className="text-center p-4 rounded-lg" style={{ backgroundColor: isDarkTheme ? 'rgba(255, 8, 68, 0.1)' : '#fef2f2' }}>
+              <div className="text-xs mb-1" style={{ color: mutedColor }}>Max Loss</div>
+              <div className="text-lg font-bold" style={{ color: isDarkTheme ? '#ff0844' : '#ef4444' }}>₹{config?.daily_max_loss?.toLocaleString()}</div>
             </div>
-            <div className="text-center p-4 rounded-lg bg-green-50">
-              <div className="text-xs text-gray-600 mb-1">Max Profit</div>
-              <div className="text-lg font-bold text-green-600">₹{config?.daily_max_profit?.toLocaleString()}</div>
+            <div className="text-center p-4 rounded-lg" style={{ backgroundColor: isDarkTheme ? 'rgba(0, 255, 136, 0.1)' : '#f0fdf4' }}>
+              <div className="text-xs mb-1" style={{ color: mutedColor }}>Max Profit</div>
+              <div className="text-lg font-bold" style={{ color: isDarkTheme ? '#00ff88' : '#10b981' }}>₹{config?.daily_max_profit?.toLocaleString()}</div>
             </div>
-            <div className="text-center p-4 rounded-lg bg-orange-50">
-              <div className="text-xs text-gray-600 mb-1">Trades Today</div>
-              <div className="text-lg font-bold text-orange-600">{status?.trades_today || 0} / {config?.max_trades_per_day}</div>
+            <div className="text-center p-4 rounded-lg" style={{ backgroundColor: isDarkTheme ? 'rgba(255, 170, 0, 0.1)' : '#fef3c7' }}>
+              <div className="text-xs mb-1" style={{ color: mutedColor }}>Trades Today</div>
+              <div className="text-lg font-bold" style={{ color: isDarkTheme ? '#ffaa00' : '#f59e0b' }}>{status?.trades_today || 0} / {config?.max_trades_per_day}</div>
             </div>
-            <div className="text-center p-4 rounded-lg bg-blue-50">
-              <div className="text-xs text-gray-600 mb-1">Status</div>
-              <div className="text-lg font-bold" style={{ color: status?.max_loss_hit ? '#ef4444' : '#10b981' }}>
+            <div className="text-center p-4 rounded-lg" style={{ backgroundColor: isDarkTheme ? 'rgba(0, 102, 255, 0.1)' : '#eff6ff' }}>
+              <div className="text-xs mb-1" style={{ color: mutedColor }}>Status</div>
+              <div className="text-lg font-bold" style={{ color: status?.max_loss_hit ? (isDarkTheme ? '#ff0844' : '#ef4444') : (isDarkTheme ? '#00ff88' : '#10b981') }}>
                 {status?.max_loss_hit ? 'LOCKED' : status?.in_cooldown ? 'COOLDOWN' : 'ACTIVE'}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Advanced Configuration */}
+        {/* Configuration Tabs */}
         <Tabs defaultValue="config" className="space-y-6">
-          <TabsList className="bg-gray-100" data-testid="dashboard-tabs">
-            <TabsTrigger value="config" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
-              Advanced Config
-            </TabsTrigger>
-            <TabsTrigger value="logs" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
-              Logs
-            </TabsTrigger>
+          <TabsList style={{ backgroundColor: isDarkTheme ? '#1a1a2e' : '#f3f4f6' }} data-testid="dashboard-tabs">
+            <TabsTrigger value="config" style={{ color: textColor }}>Advanced Config</TabsTrigger>
+            <TabsTrigger value="logs" style={{ color: textColor }}>Logs</TabsTrigger>
           </TabsList>
 
           <TabsContent value="config" data-testid="config-tab">
-            <Card>
+            <Card style={{ backgroundColor: isDarkTheme ? '#1a1a2e' : '#ffffff', borderColor: isDarkTheme ? '#2d3748' : '#e5e7eb' }}>
               <CardHeader>
-                <CardTitle>Advanced Risk Configuration</CardTitle>
+                <CardTitle style={{ color: textColor }}>Advanced Risk Configuration</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label>Set Capital (₹)</Label>
+                    <Label style={{ color: textColor }}>Set Capital (₹)</Label>
                     <Input
                       type="number"
                       value={configForm.max_position_size || ''}
                       onChange={(e) => setConfigForm({...configForm, max_position_size: e.target.value})}
-                      placeholder="Enter trading capital"
+                      style={{ backgroundColor: isDarkTheme ? '#0a0a0f' : '#ffffff', color: textColor, borderColor: isDarkTheme ? '#2d3748' : '#d1d5db' }}
                       data-testid="capital-input"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Min Loss to Count (₹)</Label>
+                    <Label style={{ color: textColor }}>Min Loss to Count (₹)</Label>
                     <Input
                       type="number"
                       value={configForm.stop_loss_percentage || ''}
                       onChange={(e) => setConfigForm({...configForm, stop_loss_percentage: e.target.value})}
-                      placeholder="Minimum loss amount"
+                      style={{ backgroundColor: isDarkTheme ? '#0a0a0f' : '#ffffff', color: textColor, borderColor: isDarkTheme ? '#2d3748' : '#d1d5db' }}
                       data-testid="min-loss-input"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Daily Max Loss (₹)</Label>
+                    <Label style={{ color: textColor }}>Daily Max Loss (₹)</Label>
                     <Input
                       type="number"
                       value={configForm.daily_max_loss || ''}
                       onChange={(e) => setConfigForm({...configForm, daily_max_loss: e.target.value})}
+                      style={{ backgroundColor: isDarkTheme ? '#0a0a0f' : '#ffffff', color: textColor, borderColor: isDarkTheme ? '#2d3748' : '#d1d5db' }}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Daily Max Profit (₹)</Label>
+                    <Label style={{ color: textColor }}>Daily Max Profit (₹)</Label>
                     <Input
                       type="number"
                       value={configForm.daily_max_profit || ''}
                       onChange={(e) => setConfigForm({...configForm, daily_max_profit: e.target.value})}
+                      style={{ backgroundColor: isDarkTheme ? '#0a0a0f' : '#ffffff', color: textColor, borderColor: isDarkTheme ? '#2d3748' : '#d1d5db' }}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Trail Step Amount (₹)</Label>
+                    <Label style={{ color: textColor }}>Trail Step Amount (₹)</Label>
                     <Input
                       type="number"
                       value={configForm.trailing_profit_step || ''}
                       onChange={(e) => setConfigForm({...configForm, trailing_profit_step: e.target.value})}
-                      placeholder="Enter trail step amount"
+                      style={{ backgroundColor: isDarkTheme ? '#0a0a0f' : '#ffffff', color: textColor, borderColor: isDarkTheme ? '#2d3748' : '#d1d5db' }}
                       data-testid="trail-step-input"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Max Trades Per Day</Label>
+                    <Label style={{ color: textColor }}>Max Trades Per Day</Label>
                     <Input
                       type="number"
                       value={configForm.max_trades_per_day || ''}
                       onChange={(e) => setConfigForm({...configForm, max_trades_per_day: e.target.value})}
+                      style={{ backgroundColor: isDarkTheme ? '#0a0a0f' : '#ffffff', color: textColor, borderColor: isDarkTheme ? '#2d3748' : '#d1d5db' }}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Consecutive Loss Limit</Label>
+                    <Label style={{ color: textColor }}>Consecutive Loss Limit</Label>
                     <Input
                       type="number"
                       value={configForm.consecutive_loss_limit || ''}
                       onChange={(e) => setConfigForm({...configForm, consecutive_loss_limit: e.target.value})}
+                      style={{ backgroundColor: isDarkTheme ? '#0a0a0f' : '#ffffff', color: textColor, borderColor: isDarkTheme ? '#2d3748' : '#d1d5db' }}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Cooldown Period (minutes)</Label>
+                    <Label style={{ color: textColor }}>Cooldown Period (minutes)</Label>
                     <Input
                       type="number"
                       value={configForm.cooldown_after_loss || ''}
                       onChange={(e) => setConfigForm({...configForm, cooldown_after_loss: e.target.value})}
+                      style={{ backgroundColor: isDarkTheme ? '#0a0a0f' : '#ffffff', color: textColor, borderColor: isDarkTheme ? '#2d3748' : '#d1d5db' }}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Side Lock</Label>
+                    <Label style={{ color: textColor }}>Side Lock</Label>
                     <Select 
                       value={configForm.side_lock || "none"} 
                       onValueChange={(value) => setConfigForm({...configForm, side_lock: value === "none" ? null : value})}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger style={{ backgroundColor: isDarkTheme ? '#0a0a0f' : '#ffffff', color: textColor, borderColor: isDarkTheme ? '#2d3748' : '#d1d5db' }}>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent style={{ backgroundColor: isDarkTheme ? '#1a1a2e' : '#ffffff' }}>
                         <SelectItem value="none">None</SelectItem>
                         <SelectItem value="BUY">BUY Only</SelectItem>
                         <SelectItem value="SELL">SELL Only</SelectItem>
@@ -379,21 +401,18 @@ const Dashboard = () => {
                   <div className="space-y-2 flex items-end">
                     <div className="flex items-center space-x-2">
                       <Switch
-                        id="trailing-profit"
                         checked={configForm.trailing_profit_enabled === true}
-                        onCheckedChange={(checked) => {
-                          setConfigForm(prev => ({...prev, trailing_profit_enabled: checked}));
-                        }}
+                        onCheckedChange={(checked) => setConfigForm(prev => ({...prev, trailing_profit_enabled: checked}))}
                       />
-                      <Label htmlFor="trailing-profit" className="cursor-pointer">Enable Trailing Profit</Label>
+                      <Label style={{ color: textColor }}>Enable Trailing Profit</Label>
                     </div>
                   </div>
                 </div>
                 <div className="mt-6 flex gap-3">
-                  <Button onClick={handleUpdateConfig} className="bg-orange-500 hover:bg-orange-600">
+                  <Button onClick={handleUpdateConfig} style={{ backgroundColor: primaryColor, color: isDarkTheme ? '#0a0a0f' : '#ffffff' }}>
                     Save All Configuration
                   </Button>
-                  <Button onClick={() => fetchData()} variant="outline">
+                  <Button onClick={() => fetchData()} variant="outline" style={{ borderColor: mutedColor, color: mutedColor }}>
                     Refresh
                   </Button>
                 </div>
@@ -402,21 +421,21 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="logs" data-testid="logs-tab">
-            <Card>
+            <Card style={{ backgroundColor: isDarkTheme ? '#1a1a2e' : '#ffffff', borderColor: isDarkTheme ? '#2d3748' : '#e5e7eb' }}>
               <CardHeader>
-                <CardTitle>Activity Logs</CardTitle>
+                <CardTitle style={{ color: textColor }}>Activity Logs</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 max-h-96 overflow-y-auto">
                   {logs.length === 0 ? (
-                    <p className="text-center text-gray-500 py-8">No logs available</p>
+                    <p className="text-center py-8" style={{ color: mutedColor }}>No logs available</p>
                   ) : (
                     logs.map((log, idx) => (
-                      <div key={idx} className="p-3 border-l-4 rounded" style={{ borderLeftColor: log.level === 'error' ? '#ef4444' : '#10b981', backgroundColor: '#f9fafb' }}>
+                      <div key={idx} className="p-3 border-l-4 rounded" style={{ borderLeftColor: log.level === 'error' ? (isDarkTheme ? '#ff0844' : '#ef4444') : (isDarkTheme ? '#00ff88' : '#10b981'), backgroundColor: isDarkTheme ? '#0a0a0f' : '#f9fafb' }}>
                         <div className="flex items-start justify-between">
                           <div>
-                            <p className="font-medium text-sm">{log.message}</p>
-                            <p className="text-xs text-gray-500 mt-1">{new Date(log.timestamp).toLocaleString()}</p>
+                            <p className="font-medium text-sm" style={{ color: textColor }}>{log.message}</p>
+                            <p className="text-xs mt-1" style={{ color: mutedColor }}>{new Date(log.timestamp).toLocaleString()}</p>
                           </div>
                         </div>
                       </div>
