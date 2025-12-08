@@ -71,6 +71,9 @@ class RiskStatus(BaseModel):
     
     id: str = Field(default="current_status")
     current_pnl: float = Field(default=0.0)
+    realised: float = Field(default=0.0)
+    unrealised: float = Field(default=0.0)
+    total_pnl: float = Field(default=0.0)
     trades_today: int = Field(default=0)
     consecutive_losses: int = Field(default=0)
     max_loss_hit: bool = Field(default=False)
@@ -78,12 +81,16 @@ class RiskStatus(BaseModel):
     position_size: float = Field(default=0.0)
     in_cooldown: bool = Field(default=False)
     cooldown_until: Optional[str] = None
+    cooldown_remaining_minutes: int = Field(default=0)
     violations: List[str] = Field(default_factory=list)
     last_trade_time: Optional[str] = None
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class RiskStatusUpdate(BaseModel):
     current_pnl: Optional[float] = None
+    realised: Optional[float] = None
+    unrealised: Optional[float] = None
+    total_pnl: Optional[float] = None
     trades_today: Optional[int] = None
     consecutive_losses: Optional[int] = None
     max_loss_hit: Optional[bool] = None
@@ -91,8 +98,13 @@ class RiskStatusUpdate(BaseModel):
     position_size: Optional[float] = None
     in_cooldown: Optional[bool] = None
     cooldown_until: Optional[str] = None
+    cooldown_remaining_minutes: Optional[int] = None
     violations: Optional[List[str]] = None
     last_trade_time: Optional[str] = None
+
+class KVStateUpdate(BaseModel):
+    """Model to accept KV state data from external system"""
+    state: Dict[str, Any]
 
 class LogEntry(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -208,6 +220,70 @@ async def reset_risk_status():
     await db.logs.insert_one(log_entry.model_dump())
     
     return {"message": "Risk status reset successfully"}
+
+# KV State Sync Endpoint
+@api_router.post("/sync-kv-state")
+async def sync_kv_state(kv_data: KVStateUpdate):
+    """Sync risk status from external KV state"""
+    try:
+        state = kv_data.state
+        
+        # Calculate cooldown remaining time
+        cooldown_remaining = 0
+        if state.get('cooldown_active') and state.get('cooldown_until'):
+            cooldown_until_ts = state['cooldown_until'] / 1000  # Convert to seconds
+            current_ts = datetime.now(timezone.utc).timestamp()
+            cooldown_remaining = max(0, int((cooldown_until_ts - current_ts) / 60))  # Minutes
+        
+        # Map KV state to RiskStatus
+        status_data = {
+            "id": "current_status",
+            "realised": state.get('realised', 0.0),
+            "unrealised": state.get('unrealised', 0.0),
+            "total_pnl": state.get('total_pnl', 0.0),
+            "current_pnl": state.get('total_pnl', 0.0),
+            "consecutive_losses": state.get('consecutive_losses', 0),
+            "in_cooldown": state.get('cooldown_active', False),
+            "cooldown_until": datetime.fromtimestamp(state['cooldown_until'] / 1000, tz=timezone.utc).isoformat() if state.get('cooldown_until') else None,
+            "cooldown_remaining_minutes": cooldown_remaining,
+            "max_loss_hit": state.get('tripped_day', False),
+            "violations": [state.get('trip_reason')] if state.get('trip_reason') else [],
+            "last_trade_time": datetime.fromtimestamp(state['last_trade_time'] / 1000, tz=timezone.utc).isoformat() if state.get('last_trade_time') else None,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # Also sync config if present
+        if 'max_loss_pct' in state:
+            capital = state.get('capital_day_915', 3000)
+            config_data = {
+                "id": "current_config",
+                "daily_max_loss": state.get('max_loss_abs', capital * state['max_loss_pct'] / 100),
+                "daily_max_profit": state.get('max_profit_abs', capital * state.get('max_profit_pct', 10) / 100),
+                "max_trades_per_day": 10,  # Not in KV, using default
+                "max_position_size": capital,
+                "stop_loss_percentage": 2.0,  # Not in KV
+                "consecutive_loss_limit": state.get('max_consecutive_losses', 3),
+                "cooldown_after_loss": state.get('cooldown_min', 15),
+                "trailing_profit_enabled": state.get('trail_step_profit', 0) > 0,
+                "trailing_profit_step": state.get('trail_step_profit', 0),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.risk_config.update_one(
+                {"id": "current_config"},
+                {"$set": config_data},
+                upsert=True
+            )
+        
+        # Update status
+        await db.risk_status.update_one(
+            {"id": "current_status"},
+            {"$set": status_data},
+            upsert=True
+        )
+        
+        return {"message": "KV state synced successfully", "status": status_data}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to sync KV state: {str(e)}")
 
 # Logs Endpoints
 @api_router.get("/logs", response_model=List[LogEntry])
