@@ -370,7 +370,7 @@ const Dashboard = () => {
                         checked={configForm.trailing_profit_enabled === true}
                         onCheckedChange={(checked) => setConfigForm(prev => ({...prev, trailing_profit_enabled: checked}))}
                       />
-                      <Label>Enable Trailing Profit</Label>
+                      <Label>Enable Cooldown after Profitable Trade</Label>
                     </div>
                   </div>
                 </div>
