@@ -440,7 +440,7 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="logs" data-testid="logs-tab">
-            <Card>
+            <Card className="bg-white/40 backdrop-blur-xl border-white/60 shadow-2xl">
               <CardHeader>
                 <CardTitle>Activity Logs</CardTitle>
               </CardHeader>
