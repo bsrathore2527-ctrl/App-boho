@@ -275,7 +275,7 @@ const Dashboard = () => {
           </TabsList>
 
           <TabsContent value="config" data-testid="config-tab">
-            <Card>
+            <Card className="bg-white/40 backdrop-blur-xl border-white/60 shadow-2xl">
               <CardHeader>
                 <CardTitle>Advanced Risk Configuration</CardTitle>
               </CardHeader>
