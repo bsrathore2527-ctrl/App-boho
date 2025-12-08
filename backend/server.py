@@ -84,6 +84,10 @@ class RiskStatus(BaseModel):
     cooldown_remaining_minutes: int = Field(default=0)
     violations: List[str] = Field(default_factory=list)
     last_trade_time: Optional[str] = None
+    peak_profit: float = Field(default=0.0, description="Peak profit reached today")
+    active_loss_floor: float = Field(default=0.0, description="Current loss floor (trailing stop)")
+    trip_reason: Optional[str] = Field(default=None, description="Reason for tripping")
+    orders_allowed: bool = Field(default=True, description="Whether new orders are allowed")
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class RiskStatusUpdate(BaseModel):
