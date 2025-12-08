@@ -191,93 +191,85 @@ const Dashboard = () => {
           </div>
           
           {/* Small Gauges */}
-          <div className="flex flex-col gap-6">
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100" data-testid="losses-gauge">
+          <div className="grid grid-cols-2 sm:grid-cols-2 gap-4">
+            <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100 flex items-center justify-center" data-testid="losses-gauge">
               <SmallGauge270
                 value={status?.consecutive_losses || 0}
                 max={config?.consecutive_loss_limit || 3}
                 label="Consecutive Losses"
-                size={180}
+                size={160}
                 isDanger={true}
               />
             </div>
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100" data-testid="cooldown-gauge">
+            <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100 flex items-center justify-center" data-testid="cooldown-gauge">
               <SmallGauge270
                 value={status?.cooldown_remaining_minutes || 0}
                 max={config?.cooldown_after_loss || 15}
                 label="Cooldown (mins)"
-                size={180}
+                size={160}
                 isDanger={false}
               />
             </div>
           </div>
         </div>
 
-        {/* Configuration Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="border-orange-200">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-orange-500" />
-                Set Capital
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Input
-                type="number"
-                value={configForm.max_position_size || ''}
-                onChange={(e) => setConfigForm({...configForm, max_position_size: e.target.value})}
-                className="mb-2"
-                placeholder="Enter capital"
-                data-testid="capital-input"
+        {/* Vertical Meters and Streak */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Vertical Meters */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+            <h3 className="text-lg font-semibold mb-6 text-gray-700">Performance Metrics</h3>
+            <div className="flex justify-around items-end">
+              <VerticalMeter
+                value={status?.trades_today || 0}
+                max={config?.max_trades_per_day || 10}
+                label="No. of Trades"
+                warningThreshold={80}
+                size={180}
               />
-              <Button onClick={handleUpdateConfig} className="w-full bg-orange-500 hover:bg-orange-600" size="sm">
-                Update Capital
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="border-orange-200">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <TrendingDown className="h-5 w-5 text-red-500" />
-                Min Loss to Count
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Input
-                type="number"
-                value={configForm.stop_loss_percentage || ''}
-                onChange={(e) => setConfigForm({...configForm, stop_loss_percentage: e.target.value})}
-                className="mb-2"
-                placeholder="Enter min loss %"
-                data-testid="min-loss-input"
+              <VerticalMeter
+                value={5}
+                max={10}
+                label="Win Streak"
+                warningThreshold={90}
+                size={180}
               />
-              <Button onClick={handleUpdateConfig} className="w-full bg-orange-500 hover:bg-orange-600" size="sm">
-                Update Min Loss
-              </Button>
-            </CardContent>
-          </Card>
+              <VerticalMeter
+                value={2}
+                max={10}
+                label="Impulsiveness"
+                warningThreshold={60}
+                size={180}
+              />
+            </div>
+          </div>
+          
+          {/* Streak Meter */}
+          <StreakMeter trades={tradeHistory} maxDisplay={20} />
+        </div>
 
-          <Card className="border-orange-200">
-            <CardHeader>
-              <CardTitle className="text-lg">Risk Limits</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Max Loss:</span>
-                <span className="font-semibold text-red-600">₹{config?.daily_max_loss?.toLocaleString()}</span>
+        {/* Risk Summary Card */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 mb-8">
+          <h3 className="text-lg font-semibold mb-4 text-gray-700">Risk Limits Summary</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div className="text-center p-4 rounded-lg bg-red-50">
+              <div className="text-xs text-gray-600 mb-1">Max Loss</div>
+              <div className="text-lg font-bold text-red-600">₹{config?.daily_max_loss?.toLocaleString()}</div>
+            </div>
+            <div className="text-center p-4 rounded-lg bg-green-50">
+              <div className="text-xs text-gray-600 mb-1">Max Profit</div>
+              <div className="text-lg font-bold text-green-600">₹{config?.daily_max_profit?.toLocaleString()}</div>
+            </div>
+            <div className="text-center p-4 rounded-lg bg-orange-50">
+              <div className="text-xs text-gray-600 mb-1">Trades Today</div>
+              <div className="text-lg font-bold text-orange-600">{status?.trades_today || 0} / {config?.max_trades_per_day}</div>
+            </div>
+            <div className="text-center p-4 rounded-lg bg-blue-50">
+              <div className="text-xs text-gray-600 mb-1">Status</div>
+              <div className="text-lg font-bold" style={{ color: status?.max_loss_hit ? '#ef4444' : '#10b981' }}>
+                {status?.max_loss_hit ? 'LOCKED' : status?.in_cooldown ? 'COOLDOWN' : 'ACTIVE'}
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Max Profit:</span>
-                <span className="font-semibold text-green-600">₹{config?.daily_max_profit?.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Trades Today:</span>
-                <span className="font-semibold">{status?.trades_today || 0} / {config?.max_trades_per_day}</span>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
         {/* Advanced Configuration */}
