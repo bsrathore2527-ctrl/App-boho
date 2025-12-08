@@ -21,6 +21,7 @@ const Dashboard = () => {
   const [config, setConfig] = useState(null);
   const [status, setStatus] = useState(null);
   const [logs, setLogs] = useState([]);
+  const [trades, setTrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [configForm, setConfigForm] = useState({});
   const [tradeHistory, setTradeHistory] = useState([
@@ -36,14 +37,16 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
-      const [configRes, statusRes, logsRes] = await Promise.all([
+      const [configRes, statusRes, logsRes, tradesRes] = await Promise.all([
         axios.get(`${API}/risk-config`),
         axios.get(`${API}/risk-status`),
-        axios.get(`${API}/logs?limit=50`)
+        axios.get(`${API}/logs?limit=50`),
+        axios.get(`${API}/trades?limit=100`)
       ]);
       setConfig(configRes.data);
       setStatus(statusRes.data);
       setLogs(logsRes.data);
+      setTrades(tradesRes.data);
       setConfigForm(configRes.data);
       setLoading(false);
     } catch (error) {
