@@ -145,9 +145,9 @@ const Dashboard = () => {
               realised={status?.realised || 0}
               unrealised={status?.unrealised || 0}
               total={status?.total_pnl || 0}
-              maxLoss={config?.daily_max_loss || 500}
-              maxProfit={config?.daily_max_profit || 1000}
-              trailStep={config?.trailing_profit_step || 250}
+              maxLoss={config?.daily_max_loss || 5000}
+              maxProfit={config?.daily_max_profit || 5000}
+              trailStep={config?.trailing_profit_step || 1000}
               size={420}
             />
           </div>
