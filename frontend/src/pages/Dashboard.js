@@ -143,7 +143,7 @@ const Dashboard = () => {
       <div className="container mx-auto px-6 py-8">
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          <div className="lg:col-span-2 flex justify-center items-center bg-white rounded-2xl shadow-lg p-8 border border-gray-100" data-testid="main-pnl-gauge">
+          <div className="lg:col-span-2 flex justify-center items-center bg-white/40 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/60 hover:shadow-orange-200/50 transition-all duration-300" data-testid="main-pnl-gauge">
             <CircularGauge270
               realised={status?.realised || 0}
               unrealised={status?.unrealised || 0}
