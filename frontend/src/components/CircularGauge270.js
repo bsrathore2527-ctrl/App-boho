@@ -113,45 +113,6 @@ const CircularGauge270 = ({
           );
         })}
         
-        <text
-          x={maxLossPos.x}
-          y={maxLossPos.y}
-          fontSize="12"
-          fill="#ef4444"
-          fontWeight="600"
-          textAnchor="middle"
-        >
-          -₹{maxLoss.toLocaleString()}
-        </text>
-        <text
-          x={maxLossPos.x}
-          y={maxLossPos.y + 14}
-          fontSize="10"
-          fill="#9ca3af"
-          textAnchor="middle"
-        >
-          Max Loss
-        </text>
-        
-        <text
-          x={maxProfitPos.x}
-          y={maxProfitPos.y}
-          fontSize="12"
-          fill="#10b981"
-          fontWeight="600"
-          textAnchor="middle"
-        >
-          +₹{maxProfit.toLocaleString()}
-        </text>
-        <text
-          x={maxProfitPos.x}
-          y={maxProfitPos.y + 14}
-          fontSize="10"
-          fill="#9ca3af"
-          textAnchor="middle"
-        >
-          Max Profit
-        </text>
       </svg>
       
       <div className="absolute inset-0 flex flex-col items-center justify-center">
