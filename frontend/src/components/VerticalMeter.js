@@ -21,10 +21,11 @@ const VerticalMeter = ({
         <div 
           className="absolute bottom-0 left-1/2 transform -translate-x-1/2"
           style={{
-            width: 24,
+            width: 28,
             height: height - 40,
-            background: '#f3f4f6',
-            borderRadius: 12
+            background: '#e5e7eb',
+            borderRadius: 14,
+            border: '2px solid #d1d5db'
           }}
         />
         
@@ -32,11 +33,15 @@ const VerticalMeter = ({
         <div 
           className="absolute bottom-0 left-1/2 transform -translate-x-1/2 transition-all duration-1000"
           style={{
-            width: 24,
+            width: 28,
             height: fillHeight,
-            background: isWarning ? 'linear-gradient(to top, #ef4444, #fca5a5)' : 'linear-gradient(to top, #10b981, #6ee7b7)',
-            borderRadius: 12,
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+            background: isWarning 
+              ? 'linear-gradient(to top, #dc2626 0%, #ef4444 50%, #fca5a5 100%)' 
+              : 'linear-gradient(to top, #059669 0%, #10b981 50%, #6ee7b7 100%)',
+            borderRadius: 14,
+            boxShadow: isWarning 
+              ? '0 0 10px rgba(239, 68, 68, 0.4), 0 4px 6px rgba(0,0,0,0.1)' 
+              : '0 0 10px rgba(16, 185, 129, 0.4), 0 4px 6px rgba(0,0,0,0.1)'
           }}
         />
         
