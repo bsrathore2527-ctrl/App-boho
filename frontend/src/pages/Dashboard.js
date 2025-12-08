@@ -208,24 +208,24 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+          <div className="bg-white/40 backdrop-blur-xl rounded-3xl shadow-2xl p-6 border border-white/60 hover:shadow-orange-200/50 transition-all duration-300">
             <h3 className="text-lg font-semibold mb-4 text-gray-700">Key Metrics</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="text-center p-4 rounded-lg bg-green-50">
+              <div className="text-center p-4 rounded-xl bg-green-50/50 backdrop-blur-sm">
                 <div className="text-xs text-gray-600 mb-1">Peak Profit</div>
                 <div className="text-lg font-bold text-green-600">₹{status?.peak_profit?.toLocaleString() || '0'}</div>
               </div>
-              <div className="text-center p-4 rounded-lg bg-blue-50">
+              <div className="text-center p-4 rounded-xl bg-blue-50/50 backdrop-blur-sm">
                 <div className="text-xs text-gray-600 mb-1">Active Loss Floor</div>
                 <div className="text-lg font-bold text-blue-600">₹{status?.active_loss_floor?.toLocaleString() || '0'}</div>
               </div>
-              <div className="text-center p-4 rounded-lg bg-red-50">
+              <div className="text-center p-4 rounded-xl bg-red-50/50 backdrop-blur-sm">
                 <div className="text-xs text-gray-600 mb-1">Remaining to Max Loss</div>
                 <div className="text-lg font-bold text-red-600">
                   ₹{((config?.daily_max_loss || 0) - Math.abs(status?.total_pnl || 0) < 0 ? 0 : (config?.daily_max_loss || 0) + (status?.total_pnl || 0)).toLocaleString()}
                 </div>
               </div>
-              <div className="text-center p-4 rounded-lg bg-purple-50">
+              <div className="text-center p-4 rounded-xl bg-purple-50/50 backdrop-blur-sm">
                 <div className="text-xs text-gray-600 mb-1">Last Trade Time</div>
                 <div className="text-sm font-bold text-purple-600">
                   {status?.last_trade_time 
@@ -236,22 +236,22 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+          <div className="bg-white/40 backdrop-blur-xl rounded-3xl shadow-2xl p-6 border border-white/60 hover:shadow-orange-200/50 transition-all duration-300">
             <h3 className="text-lg font-semibold mb-4 text-gray-700">Trading Status</h3>
             <div className="grid grid-cols-3 gap-4 text-sm">
-              <div className="text-center p-4 rounded-lg bg-blue-50 flex flex-col justify-center min-h-[80px]">
+              <div className="text-center p-4 rounded-xl bg-blue-50/50 backdrop-blur-sm flex flex-col justify-center min-h-[80px]">
                 <div className="text-xs text-gray-600 mb-2">Status</div>
                 <div className="text-base font-bold leading-tight" style={{ color: status?.max_loss_hit || status?.trip_reason ? '#ef4444' : '#10b981' }}>
                   {status?.max_loss_hit || status?.trip_reason ? 'TRIPPED' : 'ACTIVE'}
                 </div>
               </div>
-              <div className="text-center p-4 rounded-lg bg-orange-50 flex flex-col justify-center min-h-[80px]">
+              <div className="text-center p-4 rounded-xl bg-orange-50/50 backdrop-blur-sm flex flex-col justify-center min-h-[80px]">
                 <div className="text-xs text-gray-600 mb-2">New Orders</div>
                 <div className="text-base font-bold leading-tight break-words" style={{ color: status?.orders_allowed ? '#10b981' : '#ef4444' }}>
                   {status?.orders_allowed ? 'ALLOWED' : 'NOT ALLOWED'}
                 </div>
               </div>
-              <div className="text-center p-4 rounded-lg bg-gray-50 flex flex-col justify-center min-h-[80px]">
+              <div className="text-center p-4 rounded-xl bg-gray-50/50 backdrop-blur-sm flex flex-col justify-center min-h-[80px]">
                 <div className="text-xs text-gray-600 mb-2">Trip Reason</div>
                 <div className="text-sm font-bold text-gray-700 leading-tight break-words">
                   {status?.trip_reason || '-'}
