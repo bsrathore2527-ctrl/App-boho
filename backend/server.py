@@ -233,7 +233,17 @@ async def update_risk_status(status_update: RiskStatusUpdate):
 
 @api_router.post("/risk-status/reset")
 async def reset_risk_status():
-    default_status = RiskStatus(id="current_status")
+    # Create status with mock data for demonstration
+    default_status = RiskStatus(
+        id="current_status",
+        realised=600.0,
+        unrealised=400.0,
+        total_pnl=1000.0,
+        peak_profit=1500.0,
+        active_loss_floor=500.0,
+        orders_allowed=True,
+        last_trade_time=datetime.now(timezone.utc).isoformat()
+    )
     await db.risk_status.update_one(
         {"id": "current_status"},
         {"$set": default_status.model_dump()},
