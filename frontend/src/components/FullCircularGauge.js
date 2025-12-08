@@ -30,10 +30,10 @@ const FullCircularGauge = ({
   const profitStartAngle = centerAngle;
   const profitEndAngle = centerAngle + profitArcDegrees;
   
-  const radius = size / 2 - 50;
+  const radius = size / 2 - 70;
   const centerX = size / 2;
   const centerY = size / 2;
-  const strokeWidth = 32;
+  const strokeWidth = 30;
   
   const isProfit = total >= 0;
   const absTotal = Math.abs(total);
