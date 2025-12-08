@@ -22,7 +22,6 @@ const CircularGauge270 = ({
   const maxValue = isProfit ? maxProfit : maxLoss;
   const percentage = Math.min((absTotal / maxValue) * 100, 100);
   
-  // 270 degrees = 3/4 of circle, starting from bottom left (-135deg) to bottom right (135deg)
   const startAngle = -135;
   const endAngle = 135;
   const totalAngle = 270;
@@ -33,8 +32,7 @@ const CircularGauge270 = ({
   const centerY = size / 2;
   const strokeWidth = 28;
   
-  // Colors based on profit/loss
-  const fillColor = isProfit ? '#10b981' : '#ef4444'; // green : red
+  const fillColor = isProfit ? '#10b981' : '#ef4444';
   const bgColor = '#f3f4f6';
   
   const polarToCartesian = (centerX, centerY, radius, angleInDegrees) => {
@@ -54,6 +52,10 @@ const CircularGauge270 = ({
       'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y
     ].join(' ');
   };
+  
+  // Calculate positions for max loss and max profit labels
+  const maxLossPos = polarToCartesian(centerX, centerY, radius + 45, startAngle);
+  const maxProfitPos = polarToCartesian(centerX, centerY, radius + 45, endAngle);
   
   return (
     <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
@@ -114,6 +116,48 @@ const CircularGauge270 = ({
             />
           );
         })}
+        
+        {/* Max Loss label */}
+        <text
+          x={maxLossPos.x}
+          y={maxLossPos.y}
+          fontSize="12"
+          fill="#ef4444"
+          fontWeight="600"
+          textAnchor="middle"
+        >
+          -₹{maxLoss.toLocaleString()}
+        </text>
+        <text
+          x={maxLossPos.x}
+          y={maxLossPos.y + 14}
+          fontSize="10"
+          fill="#9ca3af"
+          textAnchor="middle"
+        >
+          Max Loss
+        </text>
+        
+        {/* Max Profit label */}
+        <text
+          x={maxProfitPos.x}
+          y={maxProfitPos.y}
+          fontSize="12"
+          fill="#10b981"
+          fontWeight="600"
+          textAnchor="middle"
+        >
+          +₹{maxProfit.toLocaleString()}
+        </text>
+        <text
+          x={maxProfitPos.x}
+          y={maxProfitPos.y + 14}
+          fontSize="10"
+          fill="#9ca3af"
+          textAnchor="middle"
+        >
+          Max Profit
+        </text>
       </svg>
       
       {/* Center content */}
