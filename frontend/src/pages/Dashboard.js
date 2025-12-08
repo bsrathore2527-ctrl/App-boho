@@ -316,7 +316,7 @@ const Dashboard = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Trail Step Amount (₹)</Label>
+                    <Label>Cooldown after Profitable Trade (mins)</Label>
                     <Input
                       type="number"
                       value={configForm.trailing_profit_step || ''}
