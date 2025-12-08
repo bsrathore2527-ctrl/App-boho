@@ -376,6 +376,36 @@ const Dashboard = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Action Buttons at Bottom */}
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <div className="flex flex-wrap justify-center gap-4">
+            <Button 
+              onClick={handleResetDay}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8"
+              data-testid="reset-day-btn"
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Reset Day
+            </Button>
+            <Button 
+              onClick={handleKill}
+              className="bg-red-600 hover:bg-red-700 text-white px-8"
+              data-testid="kill-btn"
+            >
+              <Square className="h-4 w-4 mr-2" />
+              Kill All
+            </Button>
+            <Button 
+              onClick={handleCancelAll}
+              className="bg-yellow-600 hover:bg-yellow-700 text-white px-8"
+              data-testid="cancel-all-btn"
+            >
+              <XCircle className="h-4 w-4 mr-2" />
+              Cancel All
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
