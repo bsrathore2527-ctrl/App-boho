@@ -138,40 +138,6 @@ const Dashboard = () => {
       </header>
 
       <div className="container mx-auto px-6 py-8">
-        <div className="flex flex-wrap gap-3 mb-8">
-          <Button 
-            onClick={handleResetDay}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-            data-testid="reset-day-btn"
-          >
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Reset Day
-          </Button>
-          <Button 
-            onClick={handleKill}
-            className="bg-red-600 hover:bg-red-700 text-white"
-            data-testid="kill-btn"
-          >
-            <Square className="h-4 w-4 mr-2" />
-            Kill All
-          </Button>
-          <Button 
-            onClick={handleCancelAll}
-            className="bg-yellow-600 hover:bg-yellow-700 text-white"
-            data-testid="cancel-all-btn"
-          >
-            <XCircle className="h-4 w-4 mr-2" />
-            Cancel All
-          </Button>
-          <Button 
-            variant="outline"
-            className="border-gray-300 text-gray-700 hover:bg-gray-50"
-            data-testid="config-btn"
-          >
-            <Settings className="h-4 w-4 mr-2" />
-            Configuration
-          </Button>
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           <div className="lg:col-span-2 flex justify-center items-center bg-white rounded-2xl shadow-lg p-8 border border-gray-100" data-testid="main-pnl-gauge">
