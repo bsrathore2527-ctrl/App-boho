@@ -262,7 +262,7 @@ const Dashboard = () => {
         </div>
 
         <Tabs defaultValue="config" className="space-y-6">
-          <TabsList className="bg-gray-100" data-testid="dashboard-tabs">
+          <TabsList className="bg-white/40 backdrop-blur-xl border border-white/60 shadow-lg" data-testid="dashboard-tabs">
             <TabsTrigger value="config" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
               Advanced Config
             </TabsTrigger>
