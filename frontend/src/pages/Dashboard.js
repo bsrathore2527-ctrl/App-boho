@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import { Shield, TrendingUp, TrendingDown, Activity, Settings, AlertTriangle, CheckCircle, Clock, Lock } from "lucide-react";
+import { Shield, User, Settings, RotateCcw, Square, XCircle, DollarSign, TrendingDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import CircularGauge from "@/components/CircularGauge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import CircularGauge270 from "@/components/CircularGauge270";
+import SmallGauge270 from "@/components/SmallGauge270";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -20,8 +21,8 @@ const Dashboard = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [configForm, setConfigForm] = useState({});
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // Mock login state
 
-  // Fetch all data
   const fetchData = async () => {
     try {
       const [configRes, statusRes, logsRes] = await Promise.all([
@@ -43,12 +44,10 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchData();
-    // Auto-refresh every 5 seconds
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  // Update configuration
   const handleUpdateConfig = async () => {
     try {
       const response = await axios.put(`${API}/risk-config`, {
@@ -64,416 +63,319 @@ const Dashboard = () => {
         side_lock: configForm.side_lock || null
       });
       setConfig(response.data);
-      toast.success("Risk configuration updated successfully");
+      toast.success("Configuration updated");
       fetchData();
     } catch (error) {
-      console.error("Error updating config:", error);
       toast.error("Failed to update configuration");
     }
   };
 
-  // Reset status
-  const handleResetStatus = async () => {
+  const handleResetDay = async () => {
     try {
       await axios.post(`${API}/risk-status/reset`);
-      toast.success("Risk status reset successfully");
+      toast.success("Day reset successfully");
       fetchData();
     } catch (error) {
-      console.error("Error resetting status:", error);
-      toast.error("Failed to reset status");
+      toast.error("Failed to reset day");
     }
   };
 
-  // Clear logs
-  const handleClearLogs = async () => {
-    try {
-      await axios.delete(`${API}/logs`);
-      toast.success("Logs cleared successfully");
-      fetchData();
-    } catch (error) {
-      console.error("Error clearing logs:", error);
-      toast.error("Failed to clear logs");
-    }
+  const handleKill = () => {
+    toast.error("Kill all positions (Feature coming soon)");
+  };
+
+  const handleCancelAll = () => {
+    toast.warning("Cancel all orders (Feature coming soon)");
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #082434 0%, #254B5A 50%, #014552 100%)' }}>
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <Activity className="h-12 w-12 animate-spin text-[#5F8BC1] mx-auto mb-4" />
-          <p className="text-[#B2D7E8] text-lg">Loading dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
-  const getPnLColor = (pnl) => {
-    if (pnl > 0) return "text-[#B2D7E8]";
-    if (pnl < 0) return "text-[#D56F53]";
-    return "text-[#99BAD7]";
-  };
-
-  const getStatusColor = () => {
-    if (status?.max_loss_hit || status?.violations?.length > 0) return "status-danger";
-    if (status?.consecutive_losses >= 2 || status?.in_cooldown) return "status-warning";
-    return "status-good";
-  };
-
-  const formatDate = (isoString) => {
-    if (!isoString) return "N/A";
-    const date = new Date(isoString);
-    return date.toLocaleString();
-  };
-
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #082434 0%, #254B5A 50%, #014552 100%)' }}>
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="border-b border-[#254B5A] bg-[#082434]/50 backdrop-blur-md">
+      <header className="border-b border-gray-200 bg-white shadow-sm">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Shield className="h-8 w-8 text-[#5F8BC1]" />
+              <Shield className="h-8 w-8 text-orange-500" />
               <div>
-                <h1 className="text-2xl font-bold text-[#B2D7E8]" style={{ fontFamily: 'Manrope, sans-serif' }}>Risk Management Dashboard</h1>
-                <p className="text-sm text-[#99BAD7]">Professional Trading Discipline</p>
+                <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Manrope, sans-serif' }}>BOHO Risk Manager</h1>
+                <p className="text-sm text-gray-500">Professional Trading Discipline</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className={`status-indicator ${getStatusColor()}`}></span>
-              <span className="text-[#99BAD7] text-sm font-medium">
-                {status?.max_loss_hit ? "LOCKED" : status?.in_cooldown ? "COOLDOWN" : "ACTIVE"}
-              </span>
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="border-orange-500 text-orange-600 hover:bg-orange-50"
+                data-testid="login-btn"
+              >
+                <User className="h-4 w-4 mr-2" />
+                Login
+              </Button>
             </div>
           </div>
         </div>
       </header>
 
       <div className="container mx-auto px-6 py-8">
-        {/* Circular Gauges Section */}
-        <div className="glass-card p-8 mb-8">
-          <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16">
-            {/* Main P&L Gauge */}
-            <div className="flex flex-col items-center" data-testid="pnl-gauge">
-              <CircularGauge
-                value={parseFloat(((status?.total_pnl || 0) / (config?.daily_max_profit || 1) * 100).toFixed(2))}
-                min={-100}
-                max={100}
-                label="Today's P&L"
-                unit="%"
-                size={280}
-                type="pnl"
-                colors={['#D56F53', '#E4AD75', '#5F8BC1']}
+        {/* Action Buttons */}
+        <div className="flex flex-wrap gap-3 mb-8">
+          <Button 
+            onClick={handleResetDay}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+            data-testid="reset-day-btn"
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Reset Day
+          </Button>
+          <Button 
+            onClick={handleKill}
+            className="bg-red-600 hover:bg-red-700 text-white"
+            data-testid="kill-btn"
+          >
+            <Square className="h-4 w-4 mr-2" />
+            Kill All
+          </Button>
+          <Button 
+            onClick={handleCancelAll}
+            className="bg-yellow-600 hover:bg-yellow-700 text-white"
+            data-testid="cancel-all-btn"
+          >
+            <XCircle className="h-4 w-4 mr-2" />
+            Cancel All
+          </Button>
+          <Button 
+            variant="outline"
+            className="border-gray-300 text-gray-700 hover:bg-gray-50"
+            data-testid="config-btn"
+          >
+            <Settings className="h-4 w-4 mr-2" />
+            Configuration
+          </Button>
+        </div>
+
+        {/* Gauges Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* Main P&L Gauge */}
+          <div className="lg:col-span-2 flex justify-center items-center bg-white rounded-2xl shadow-lg p-8 border border-gray-100" data-testid="main-pnl-gauge">
+            <CircularGauge270
+              realised={status?.realised || 0}
+              unrealised={status?.unrealised || 0}
+              total={status?.total_pnl || 0}
+              maxLoss={config?.daily_max_loss || 5000}
+              maxProfit={config?.daily_max_profit || 10000}
+              size={380}
+            />
+          </div>
+          
+          {/* Small Gauges */}
+          <div className="flex flex-col gap-6">
+            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100" data-testid="losses-gauge">
+              <SmallGauge270
+                value={status?.consecutive_losses || 0}
+                max={config?.consecutive_loss_limit || 3}
+                label="Consecutive Losses"
+                size={180}
+                isDanger={true}
               />
             </div>
-            
-            {/* Secondary Gauges */}
-            <div className="flex flex-col sm:flex-row gap-8 lg:gap-12">
-              {/* Consecutive Losses Gauge */}
-              <div className="flex flex-col items-center" data-testid="losses-gauge">
-                <CircularGauge
-                  value={status?.consecutive_losses || 0}
-                  min={0}
-                  max={config?.consecutive_loss_limit || 3}
-                  label="Consecutive Losses"
-                  unit=""
-                  size={200}
-                  type="loss"
-                  colors={['#D56F53', '#E4AD75', '#5F8BC1']}
-                />
-              </div>
-              
-              {/* Cooldown Gauge */}
-              <div className="flex flex-col items-center" data-testid="cooldown-gauge">
-                <CircularGauge
-                  value={status?.cooldown_remaining_minutes || 0}
-                  min={0}
-                  max={config?.cooldown_after_loss || 15}
-                  label="Cooldown"
-                  unit="m"
-                  size={200}
-                  type="cooldown"
-                  colors={['#D56F53', '#E4AD75', '#5F8BC1']}
-                />
-              </div>
-            </div>
-          </div>
-          
-          {/* P&L Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            <div className="text-center p-6 rounded-xl" style={{ background: 'rgba(13, 42, 52, 0.4)', border: '1px solid rgba(95, 139, 193, 0.2)' }}>
-              <div className="text-sm text-[#99BAD7] mb-2">Realised</div>
-              <div className="text-3xl font-bold text-[#5F8BC1]">
-                +₹{(status?.realised || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </div>
-            </div>
-            
-            <div className="text-center p-6 rounded-xl" style={{ background: 'rgba(13, 42, 52, 0.4)', border: '1px solid rgba(213, 111, 83, 0.2)' }}>
-              <div className="text-sm text-[#99BAD7] mb-2">Unrealised</div>
-              <div className={`text-3xl font-bold ${(status?.unrealised || 0) >= 0 ? 'text-[#5F8BC1]' : 'text-[#D56F53]'}`}>
-                {(status?.unrealised || 0) >= 0 ? '+' : ''}₹{(status?.unrealised || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </div>
-            </div>
-            
-            <div className="text-center p-6 rounded-xl" style={{ background: 'rgba(13, 42, 52, 0.4)', border: '1px solid rgba(95, 139, 193, 0.3)' }}>
-              <div className="text-sm text-[#99BAD7] mb-2">Total</div>
-              <div className={`text-3xl font-bold ${(status?.total_pnl || 0) >= 0 ? 'text-[#5F8BC1]' : 'text-[#D56F53]'}`}>
-                {(status?.total_pnl || 0) >= 0 ? '+' : ''}₹{(status?.total_pnl || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </div>
-            </div>
-          </div>
-          
-          {/* Risk Summary */}
-          <div className="mt-8 p-6 rounded-xl" style={{ background: 'rgba(13, 42, 52, 0.3)', border: '1px solid rgba(95, 139, 193, 0.15)' }}>
-            <h3 className="text-xl font-bold text-[#B2D7E8] mb-4" style={{ fontFamily: 'Manrope, sans-serif' }}>Risk Summary</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <div className="text-xs text-[#99BAD7]">Max Loss</div>
-                <div className="text-lg font-bold text-[#D56F53]">₹{config?.daily_max_loss?.toLocaleString() || 0}</div>
-              </div>
-              <div>
-                <div className="text-xs text-[#99BAD7]">Max Profit</div>
-                <div className="text-lg font-bold text-[#5F8BC1]">₹{config?.daily_max_profit?.toLocaleString() || 0}</div>
-              </div>
-              <div>
-                <div className="text-xs text-[#99BAD7]">Trades Today</div>
-                <div className="text-lg font-bold text-[#E4AD75]">{status?.trades_today || 0} / {config?.max_trades_per_day}</div>
-              </div>
-              <div>
-                <div className="text-xs text-[#99BAD7]">Status</div>
-                <div className="text-lg font-bold" style={{ color: status?.max_loss_hit ? '#D56F53' : '#5F8BC1' }}>
-                  {status?.max_loss_hit ? 'LOCKED' : status?.in_cooldown ? 'COOLDOWN' : 'ACTIVE'}
-                </div>
-              </div>
+            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100" data-testid="cooldown-gauge">
+              <SmallGauge270
+                value={status?.cooldown_remaining_minutes || 0}
+                max={config?.cooldown_after_loss || 15}
+                label="Cooldown (mins)"
+                size={180}
+                isDanger={false}
+              />
             </div>
           </div>
         </div>
 
-        {/* Violations Alert */}
-        {status?.violations?.length > 0 && (
-          <div className="mb-6 p-4 rounded-lg border-2 border-[#D56F53] bg-[#D56F53]/10" data-testid="violations-alert">
-            <div className="flex items-center gap-2 mb-2">
-              <AlertTriangle className="h-5 w-5 text-[#D56F53]" />
-              <h3 className="text-lg font-bold text-[#D56F53]">Active Violations</h3>
-            </div>
-            <ul className="list-disc list-inside text-[#B2D7E8]">
-              {status.violations.map((violation, idx) => (
-                <li key={idx}>{violation}</li>
-              ))}
-            </ul>
-          </div>
-        )}
+        {/* Configuration Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <Card className="border-orange-200">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <DollarSign className="h-5 w-5 text-orange-500" />
+                Set Capital
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Input
+                type="number"
+                value={configForm.max_position_size || ''}
+                onChange={(e) => setConfigForm({...configForm, max_position_size: e.target.value})}
+                className="mb-2"
+                placeholder="Enter capital"
+                data-testid="capital-input"
+              />
+              <Button onClick={handleUpdateConfig} className="w-full bg-orange-500 hover:bg-orange-600" size="sm">
+                Update Capital
+              </Button>
+            </CardContent>
+          </Card>
 
-        {/* Main Content Tabs */}
+          <Card className="border-orange-200">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <TrendingDown className="h-5 w-5 text-red-500" />
+                Min Loss to Count
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Input
+                type="number"
+                value={configForm.stop_loss_percentage || ''}
+                onChange={(e) => setConfigForm({...configForm, stop_loss_percentage: e.target.value})}
+                className="mb-2"
+                placeholder="Enter min loss %"
+                data-testid="min-loss-input"
+              />
+              <Button onClick={handleUpdateConfig} className="w-full bg-orange-500 hover:bg-orange-600" size="sm">
+                Update Min Loss
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-orange-200">
+            <CardHeader>
+              <CardTitle className="text-lg">Risk Limits</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Max Loss:</span>
+                <span className="font-semibold text-red-600">₹{config?.daily_max_loss?.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Max Profit:</span>
+                <span className="font-semibold text-green-600">₹{config?.daily_max_profit?.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Trades Today:</span>
+                <span className="font-semibold">{status?.trades_today || 0} / {config?.max_trades_per_day}</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Advanced Configuration */}
         <Tabs defaultValue="config" className="space-y-6">
-          <TabsList className="bg-[#082434]/50 border border-[#254B5A]" data-testid="dashboard-tabs">
-            <TabsTrigger value="config" className="data-[state=active]:bg-[#5F8BC1] data-[state=active]:text-white">
-              <Settings className="h-4 w-4 mr-2" />
-              Configuration
+          <TabsList className="bg-gray-100" data-testid="dashboard-tabs">
+            <TabsTrigger value="config" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
+              Advanced Config
             </TabsTrigger>
-            <TabsTrigger value="logs" className="data-[state=active]:bg-[#5F8BC1] data-[state=active]:text-white">
-              <Clock className="h-4 w-4 mr-2" />
+            <TabsTrigger value="logs" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
               Logs
             </TabsTrigger>
           </TabsList>
 
-          {/* Configuration Tab */}
           <TabsContent value="config" data-testid="config-tab">
-            <div className="glass-card p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-[#B2D7E8]" style={{ fontFamily: 'Manrope, sans-serif' }}>Risk Parameters Configuration</h2>
-                <Button onClick={handleResetStatus} variant="outline" className="border-[#D56F53] text-[#D56F53] hover:bg-[#D56F53] hover:text-white" data-testid="reset-status-btn">
-                  Reset Status
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="daily_max_loss" className="text-[#B2D7E8]">Daily Max Loss (₹)</Label>
-                  <Input
-                    id="daily_max_loss"
-                    type="number"
-                    value={configForm.daily_max_loss || ''}
-                    onChange={(e) => setConfigForm({...configForm, daily_max_loss: e.target.value})}
-                    className="bg-[#082434]/50 border-[#254B5A] text-[#B2D7E8]"
-                    data-testid="input-daily-max-loss"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="daily_max_profit" className="text-[#B2D7E8]">Daily Max Profit (₹)</Label>
-                  <Input
-                    id="daily_max_profit"
-                    type="number"
-                    value={configForm.daily_max_profit || ''}
-                    onChange={(e) => setConfigForm({...configForm, daily_max_profit: e.target.value})}
-                    className="bg-[#082434]/50 border-[#254B5A] text-[#B2D7E8]"
-                    data-testid="input-daily-max-profit"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="max_trades_per_day" className="text-[#B2D7E8]">Max Trades Per Day</Label>
-                  <Input
-                    id="max_trades_per_day"
-                    type="number"
-                    value={configForm.max_trades_per_day || ''}
-                    onChange={(e) => setConfigForm({...configForm, max_trades_per_day: e.target.value})}
-                    className="bg-[#082434]/50 border-[#254B5A] text-[#B2D7E8]"
-                    data-testid="input-max-trades"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="max_position_size" className="text-[#B2D7E8]">Max Position Size (₹)</Label>
-                  <Input
-                    id="max_position_size"
-                    type="number"
-                    value={configForm.max_position_size || ''}
-                    onChange={(e) => setConfigForm({...configForm, max_position_size: e.target.value})}
-                    className="bg-[#082434]/50 border-[#254B5A] text-[#B2D7E8]"
-                    data-testid="input-max-position-size"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="stop_loss_percentage" className="text-[#B2D7E8]">Stop Loss Percentage (%)</Label>
-                  <Input
-                    id="stop_loss_percentage"
-                    type="number"
-                    step="0.1"
-                    value={configForm.stop_loss_percentage || ''}
-                    onChange={(e) => setConfigForm({...configForm, stop_loss_percentage: e.target.value})}
-                    className="bg-[#082434]/50 border-[#254B5A] text-[#B2D7E8]"
-                    data-testid="input-stop-loss"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="consecutive_loss_limit" className="text-[#B2D7E8]">Consecutive Loss Limit</Label>
-                  <Input
-                    id="consecutive_loss_limit"
-                    type="number"
-                    value={configForm.consecutive_loss_limit || ''}
-                    onChange={(e) => setConfigForm({...configForm, consecutive_loss_limit: e.target.value})}
-                    className="bg-[#082434]/50 border-[#254B5A] text-[#B2D7E8]"
-                    data-testid="input-consecutive-loss-limit"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="cooldown_after_loss" className="text-[#B2D7E8]">Cooldown After Loss (minutes)</Label>
-                  <Input
-                    id="cooldown_after_loss"
-                    type="number"
-                    value={configForm.cooldown_after_loss || ''}
-                    onChange={(e) => setConfigForm({...configForm, cooldown_after_loss: e.target.value})}
-                    className="bg-[#082434]/50 border-[#254B5A] text-[#B2D7E8]"
-                    data-testid="input-cooldown"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="side_lock" className="text-[#B2D7E8]">Side Lock</Label>
-                  <Select 
-                    value={configForm.side_lock || "none"} 
-                    onValueChange={(value) => setConfigForm({...configForm, side_lock: value === "none" ? null : value})}
-                  >
-                    <SelectTrigger className="bg-[#082434]/50 border-[#254B5A] text-[#B2D7E8]" data-testid="select-side-lock">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#082434] border-[#254B5A]">
-                      <SelectItem value="none">None</SelectItem>
-                      <SelectItem value="BUY">BUY Only</SelectItem>
-                      <SelectItem value="SELL">SELL Only</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-4 col-span-1 md:col-span-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="trailing_profit" className="text-[#B2D7E8]">Enable Trailing Profit</Label>
-                    <Switch
-                      id="trailing_profit"
-                      checked={configForm.trailing_profit_enabled === true}
-                      onCheckedChange={(checked) => {
-                        setConfigForm(prev => ({...prev, trailing_profit_enabled: checked}));
-                      }}
-                      data-testid="switch-trailing-profit"
+            <Card>
+              <CardHeader>
+                <CardTitle>Risk Parameters</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label>Daily Max Loss (₹)</Label>
+                    <Input
+                      type="number"
+                      value={configForm.daily_max_loss || ''}
+                      onChange={(e) => setConfigForm({...configForm, daily_max_loss: e.target.value})}
                     />
                   </div>
-                  {configForm.trailing_profit_enabled === true && (
-                    <div className="space-y-2">
-                      <Label htmlFor="trailing_profit_step" className="text-[#B2D7E8]">Trailing Profit Step (%)</Label>
-                      <Input
-                        id="trailing_profit_step"
-                        type="number"
-                        step="0.1"
-                        value={configForm.trailing_profit_step || ''}
-                        onChange={(e) => setConfigForm(prev => ({...prev, trailing_profit_step: e.target.value}))}
-                        className="bg-[#082434]/50 border-[#254B5A] text-[#B2D7E8]"
-                        data-testid="input-trailing-step"
-                      />
-                    </div>
-                  )}
+                  <div className="space-y-2">
+                    <Label>Daily Max Profit (₹)</Label>
+                    <Input
+                      type="number"
+                      value={configForm.daily_max_profit || ''}
+                      onChange={(e) => setConfigForm({...configForm, daily_max_profit: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Max Trades Per Day</Label>
+                    <Input
+                      type="number"
+                      value={configForm.max_trades_per_day || ''}
+                      onChange={(e) => setConfigForm({...configForm, max_trades_per_day: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Consecutive Loss Limit</Label>
+                    <Input
+                      type="number"
+                      value={configForm.consecutive_loss_limit || ''}
+                      onChange={(e) => setConfigForm({...configForm, consecutive_loss_limit: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Cooldown Period (minutes)</Label>
+                    <Input
+                      type="number"
+                      value={configForm.cooldown_after_loss || ''}
+                      onChange={(e) => setConfigForm({...configForm, cooldown_after_loss: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Side Lock</Label>
+                    <Select 
+                      value={configForm.side_lock || "none"} 
+                      onValueChange={(value) => setConfigForm({...configForm, side_lock: value === "none" ? null : value})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        <SelectItem value="BUY">BUY Only</SelectItem>
+                        <SelectItem value="SELL">SELL Only</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              </div>
-
-              <div className="mt-6 flex justify-end">
-                <Button onClick={handleUpdateConfig} className="bg-[#5F8BC1] hover:bg-[#5F8BC1]/80 text-white px-8" data-testid="update-config-btn">
-                  Update Configuration
-                </Button>
-              </div>
-
-              <div className="mt-6 pt-6 border-t border-[#254B5A]">
-                <p className="text-sm text-[#99BAD7]">Last updated: {formatDate(config?.updated_at)}</p>
-              </div>
-            </div>
+                <div className="mt-6">
+                  <Button onClick={handleUpdateConfig} className="bg-orange-500 hover:bg-orange-600">
+                    Save Configuration
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
-          {/* Logs Tab */}
           <TabsContent value="logs" data-testid="logs-tab">
-            <div className="glass-card p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-[#B2D7E8]" style={{ fontFamily: 'Manrope, sans-serif' }}>Activity Logs</h2>
-                <Button onClick={handleClearLogs} variant="outline" className="border-[#D56F53] text-[#D56F53] hover:bg-[#D56F53] hover:text-white" data-testid="clear-logs-btn">
-                  Clear All Logs
-                </Button>
-              </div>
-
-              <div className="space-y-2 max-h-[600px] overflow-y-auto scrollbar-thin" data-testid="logs-container">
-                {logs.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Clock className="h-12 w-12 text-[#99BAD7] mx-auto mb-4 opacity-50" />
-                    <p className="text-[#99BAD7]">No logs available</p>
-                  </div>
-                ) : (
-                  logs.map((log, idx) => (
-                    <div key={idx} className={`log-entry log-${log.level}`} data-testid={`log-entry-${idx}`}>
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            {log.level === 'error' && <AlertTriangle className="h-4 w-4 text-[#D56F53]" />}
-                            {log.level === 'warning' && <AlertTriangle className="h-4 w-4 text-[#E4AD75]" />}
-                            {log.level === 'success' && <CheckCircle className="h-4 w-4 text-[#B2D7E8]" />}
-                            {log.level === 'info' && <Activity className="h-4 w-4 text-[#5F8BC1]" />}
-                            <span className="text-sm font-medium text-[#B2D7E8]">{log.message}</span>
+            <Card>
+              <CardHeader>
+                <CardTitle>Activity Logs</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {logs.length === 0 ? (
+                    <p className="text-center text-gray-500 py-8">No logs available</p>
+                  ) : (
+                    logs.map((log, idx) => (
+                      <div key={idx} className="p-3 border-l-4 rounded" style={{ borderLeftColor: log.level === 'error' ? '#ef4444' : '#10b981', backgroundColor: '#f9fafb' }}>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="font-medium text-sm">{log.message}</p>
+                            <p className="text-xs text-gray-500 mt-1">{new Date(log.timestamp).toLocaleString()}</p>
                           </div>
-                          <div className="flex items-center gap-4 text-xs text-[#99BAD7]">
-                            <span>{log.type}</span>
-                            <span>{formatDate(log.timestamp)}</span>
-                          </div>
-                          {log.details && (
-                            <pre className="mt-2 text-xs text-[#99BAD7] bg-[#082434]/50 p-2 rounded overflow-x-auto">
-                              {JSON.stringify(log.details, null, 2)}
-                            </pre>
-                          )}
                         </div>
                       </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
