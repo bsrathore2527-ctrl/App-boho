@@ -16,7 +16,7 @@ import StreakMeter from "@/components/StreakMeter";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
-const THEME = process.env.REACT_APP_THEME || 'light';
+const THEME = process.env.REACT_APP_THEME || 'dark';
 
 const Dashboard = () => {
   const [config, setConfig] = useState(null);
