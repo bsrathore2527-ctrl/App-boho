@@ -80,7 +80,7 @@ const CircularGauge270 = ({
         {/* Value arc with animation */}
         <path
           d={describeArc(centerX, centerY, radius, startAngle, valueAngle)}
-          fill="none
+          fill="none"
           stroke="url(#gauge-fill)"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
