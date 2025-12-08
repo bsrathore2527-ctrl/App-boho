@@ -189,7 +189,7 @@ const FullCircularGauge = ({
       </svg>
       
       {/* Center content */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
+      <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-center">
           <div 
             className="text-5xl font-bold mb-2" 
@@ -204,7 +204,7 @@ const FullCircularGauge = ({
           <div className="text-xs uppercase tracking-wider mb-3 text-gray-500 font-semibold">
             Total P&L
           </div>
-          <div className="flex gap-5 text-sm">
+          <div className="flex gap-5 text-sm justify-center">
             <div className="text-center">
               <div 
                 className="font-bold text-base"
