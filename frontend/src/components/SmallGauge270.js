@@ -75,11 +75,11 @@ const SmallGauge270 = ({
       {/* Center content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <div className="text-center">
-          <div className="text-3xl font-bold" style={{ color: fillColor, fontFamily: 'Manrope, sans-serif' }}>
+          <div className="text-2xl font-bold" style={{ color: fillColor, fontFamily: 'Manrope, sans-serif' }}>
             {value}
           </div>
-          <div className="text-xs text-gray-500 uppercase mt-1">{label}</div>
-          <div className="text-xs text-gray-400 mt-1">Max: {max}</div>
+          <div className="text-[10px] text-gray-500 uppercase mt-0.5 tracking-wide">{label}</div>
+          <div className="text-[9px] text-gray-400 mt-0.5">Max: {max}</div>
         </div>
       </div>
     </div>
