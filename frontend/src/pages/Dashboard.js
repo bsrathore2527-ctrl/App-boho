@@ -177,7 +177,7 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+          <div className="bg-white/40 backdrop-blur-xl rounded-3xl shadow-2xl p-6 border border-white/60 hover:shadow-orange-200/50 transition-all duration-300">
             <h3 className="text-lg font-semibold mb-6 text-gray-700">Performance Metrics</h3>
             <div className="flex justify-around items-end">
               <VerticalMeter
