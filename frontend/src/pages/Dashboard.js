@@ -149,57 +149,101 @@ const Dashboard = () => {
       </header>
 
       <div className="container mx-auto px-6 py-8">
-        {/* Status Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="metric-card" data-testid="pnl-card">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[#99BAD7] text-sm font-medium">Current P&L</span>
-              {status?.current_pnl >= 0 ? <TrendingUp className="h-5 w-5 text-[#B2D7E8]" /> : <TrendingDown className="h-5 w-5 text-[#D56F53]" />}
+        {/* Circular Gauges Section */}
+        <div className="glass-card p-8 mb-8">
+          <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16">
+            {/* Main P&L Gauge */}
+            <div className="flex flex-col items-center" data-testid="pnl-gauge">
+              <CircularGauge
+                value={parseFloat(((status?.total_pnl || 0) / (config?.daily_max_profit || 1) * 100).toFixed(2))}
+                min={-100}
+                max={100}
+                label="Today's P&L"
+                unit="%"
+                size={280}
+                type="pnl"
+                colors={['#D56F53', '#E4AD75', '#5F8BC1']}
+              />
             </div>
-            <div className={`text-3xl font-bold ${getPnLColor(status?.current_pnl)}`}>
-              ₹{status?.current_pnl?.toLocaleString() || 0}
-            </div>
-            <div className="text-xs text-[#99BAD7] mt-1">
-              Limit: ₹{config?.daily_max_loss?.toLocaleString()} / ₹{config?.daily_max_profit?.toLocaleString()}
+            
+            {/* Secondary Gauges */}
+            <div className="flex flex-col sm:flex-row gap-8 lg:gap-12">
+              {/* Consecutive Losses Gauge */}
+              <div className="flex flex-col items-center" data-testid="losses-gauge">
+                <CircularGauge
+                  value={status?.consecutive_losses || 0}
+                  min={0}
+                  max={config?.consecutive_loss_limit || 3}
+                  label="Consecutive Losses"
+                  unit=""
+                  size={200}
+                  type="loss"
+                  colors={['#D56F53', '#E4AD75', '#5F8BC1']}
+                />
+              </div>
+              
+              {/* Cooldown Gauge */}
+              <div className="flex flex-col items-center" data-testid="cooldown-gauge">
+                <CircularGauge
+                  value={status?.cooldown_remaining_minutes || 0}
+                  min={0}
+                  max={config?.cooldown_after_loss || 15}
+                  label="Cooldown"
+                  unit="m"
+                  size={200}
+                  type="cooldown"
+                  colors={['#D56F53', '#E4AD75', '#5F8BC1']}
+                />
+              </div>
             </div>
           </div>
-
-          <div className="metric-card" data-testid="trades-card">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[#99BAD7] text-sm font-medium">Trades Today</span>
-              <Activity className="h-5 w-5 text-[#E4AD75]" />
+          
+          {/* P&L Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <div className="text-center p-6 rounded-xl" style={{ background: 'rgba(13, 42, 52, 0.4)', border: '1px solid rgba(95, 139, 193, 0.2)' }}>
+              <div className="text-sm text-[#99BAD7] mb-2">Realised</div>
+              <div className="text-3xl font-bold text-[#5F8BC1]">
+                +₹{(status?.realised || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
             </div>
-            <div className="text-3xl font-bold text-[#E4AD75]">
-              {status?.trades_today || 0}
+            
+            <div className="text-center p-6 rounded-xl" style={{ background: 'rgba(13, 42, 52, 0.4)', border: '1px solid rgba(213, 111, 83, 0.2)' }}>
+              <div className="text-sm text-[#99BAD7] mb-2">Unrealised</div>
+              <div className={`text-3xl font-bold ${(status?.unrealised || 0) >= 0 ? 'text-[#5F8BC1]' : 'text-[#D56F53]'}`}>
+                {(status?.unrealised || 0) >= 0 ? '+' : ''}₹{(status?.unrealised || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
             </div>
-            <div className="text-xs text-[#99BAD7] mt-1">
-              Max: {config?.max_trades_per_day}
-            </div>
-          </div>
-
-          <div className="metric-card" data-testid="consecutive-losses-card">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[#99BAD7] text-sm font-medium">Consecutive Losses</span>
-              <AlertTriangle className="h-5 w-5 text-[#D56F53]" />
-            </div>
-            <div className="text-3xl font-bold text-[#D56F53]">
-              {status?.consecutive_losses || 0}
-            </div>
-            <div className="text-xs text-[#99BAD7] mt-1">
-              Limit: {config?.consecutive_loss_limit}
+            
+            <div className="text-center p-6 rounded-xl" style={{ background: 'rgba(13, 42, 52, 0.4)', border: '1px solid rgba(95, 139, 193, 0.3)' }}>
+              <div className="text-sm text-[#99BAD7] mb-2">Total</div>
+              <div className={`text-3xl font-bold ${(status?.total_pnl || 0) >= 0 ? 'text-[#5F8BC1]' : 'text-[#D56F53]'}`}>
+                {(status?.total_pnl || 0) >= 0 ? '+' : ''}₹{(status?.total_pnl || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
             </div>
           </div>
-
-          <div className="metric-card" data-testid="position-size-card">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[#99BAD7] text-sm font-medium">Position Size</span>
-              <Lock className="h-5 w-5 text-[#5F8BC1]" />
-            </div>
-            <div className="text-3xl font-bold text-[#5F8BC1]">
-              ₹{status?.position_size?.toLocaleString() || 0}
-            </div>
-            <div className="text-xs text-[#99BAD7] mt-1">
-              Max: ₹{config?.max_position_size?.toLocaleString()}
+          
+          {/* Risk Summary */}
+          <div className="mt-8 p-6 rounded-xl" style={{ background: 'rgba(13, 42, 52, 0.3)', border: '1px solid rgba(95, 139, 193, 0.15)' }}>
+            <h3 className="text-xl font-bold text-[#B2D7E8] mb-4" style={{ fontFamily: 'Manrope, sans-serif' }}>Risk Summary</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <div className="text-xs text-[#99BAD7]">Max Loss</div>
+                <div className="text-lg font-bold text-[#D56F53]">₹{config?.daily_max_loss?.toLocaleString() || 0}</div>
+              </div>
+              <div>
+                <div className="text-xs text-[#99BAD7]">Max Profit</div>
+                <div className="text-lg font-bold text-[#5F8BC1]">₹{config?.daily_max_profit?.toLocaleString() || 0}</div>
+              </div>
+              <div>
+                <div className="text-xs text-[#99BAD7]">Trades Today</div>
+                <div className="text-lg font-bold text-[#E4AD75]">{status?.trades_today || 0} / {config?.max_trades_per_day}</div>
+              </div>
+              <div>
+                <div className="text-xs text-[#99BAD7]">Status</div>
+                <div className="text-lg font-bold" style={{ color: status?.max_loss_hit ? '#D56F53' : '#5F8BC1' }}>
+                  {status?.max_loss_hit ? 'LOCKED' : status?.in_cooldown ? 'COOLDOWN' : 'ACTIVE'}
+                </div>
+              </div>
             </div>
           </div>
         </div>
