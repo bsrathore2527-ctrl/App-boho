@@ -186,17 +186,6 @@ const FullCircularGauge = ({
           />
         )}
         
-        {/* Ratio indicator at top */}
-        <text
-          x={centerX}
-          y={30}
-          fill="#6b7280"
-          fontSize="11"
-          fontWeight="600"
-          textAnchor="middle"
-        >
-          Ratio {maxLoss}:{maxProfit} ({Math.round(lossArcDegrees)}°/{Math.round(profitArcDegrees)}°)
-        </text>
       </svg>
       
       {/* Center content */}
