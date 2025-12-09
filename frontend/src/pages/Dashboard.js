@@ -21,6 +21,7 @@ const Dashboard = () => {
   const [config, setConfig] = useState(null);
   const [status, setStatus] = useState(null);
   const [logs, setLogs] = useState([]);
+  const [trades, setTrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [configForm, setConfigForm] = useState({});
   const [tradeHistory, setTradeHistory] = useState([
@@ -36,14 +37,16 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
-      const [configRes, statusRes, logsRes] = await Promise.all([
+      const [configRes, statusRes, logsRes, tradesRes] = await Promise.all([
         axios.get(`${API}/risk-config`),
         axios.get(`${API}/risk-status`),
-        axios.get(`${API}/logs?limit=50`)
+        axios.get(`${API}/logs?limit=50`),
+        axios.get(`${API}/trades?limit=100`)
       ]);
       setConfig(configRes.data);
       setStatus(statusRes.data);
       setLogs(logsRes.data);
+      setTrades(tradesRes.data);
       setConfigForm(configRes.data);
       setLoading(false);
     } catch (error) {
@@ -111,8 +114,8 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="border-b border-gray-200 bg-white shadow-sm">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50">
+      <header className="border-b border-white/20 bg-white/60 backdrop-blur-md shadow-lg">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -140,20 +143,19 @@ const Dashboard = () => {
       <div className="container mx-auto px-6 py-8">
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          <div className="lg:col-span-2 flex justify-center items-center bg-white rounded-2xl shadow-lg p-8 border border-gray-100" data-testid="main-pnl-gauge">
-            <FullCircularGauge
+          <div className="lg:col-span-2 flex justify-center items-center bg-white/40 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/60 hover:shadow-orange-200/50 transition-all duration-300" data-testid="main-pnl-gauge">
+            <CircularGauge270
               realised={status?.realised || 0}
               unrealised={status?.unrealised || 0}
               total={status?.total_pnl || 0}
               maxLoss={config?.daily_max_loss || 5000}
               maxProfit={config?.daily_max_profit || 5000}
-              trailStep={config?.trailing_profit_step || 1000}
-              size={420}
+              size={380}
             />
           </div>
           
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100 flex items-center justify-center" data-testid="losses-gauge">
+            <div className="bg-white/40 backdrop-blur-xl rounded-3xl shadow-2xl p-4 border border-white/60 flex items-center justify-center hover:shadow-orange-200/50 transition-all duration-300" data-testid="losses-gauge">
               <SmallGauge270
                 value={status?.consecutive_losses || 0}
                 max={config?.consecutive_loss_limit || 3}
@@ -162,7 +164,7 @@ const Dashboard = () => {
                 isDanger={true}
               />
             </div>
-            <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100 flex items-center justify-center" data-testid="cooldown-gauge">
+            <div className="bg-white/40 backdrop-blur-xl rounded-3xl shadow-2xl p-4 border border-white/60 flex items-center justify-center hover:shadow-orange-200/50 transition-all duration-300" data-testid="cooldown-gauge">
               <SmallGauge270
                 value={status?.cooldown_remaining_minutes || 0}
                 max={config?.cooldown_after_loss || 15}
@@ -175,7 +177,7 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+          <div className="bg-white/40 backdrop-blur-xl rounded-3xl shadow-2xl p-6 border border-white/60 hover:shadow-orange-200/50 transition-all duration-300">
             <h3 className="text-lg font-semibold mb-6 text-gray-700">Performance Metrics</h3>
             <div className="flex justify-around items-end">
               <VerticalMeter
@@ -205,34 +207,67 @@ const Dashboard = () => {
           <StreakMeter trades={tradeHistory} maxDisplay={20} />
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 mb-8">
-          <h3 className="text-lg font-semibold mb-4 text-gray-700">Risk Limits Summary</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div className="text-center p-4 rounded-lg bg-red-50">
-              <div className="text-xs text-gray-600 mb-1">Max Loss</div>
-              <div className="text-lg font-bold text-red-600">₹{config?.daily_max_loss?.toLocaleString()}</div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div className="bg-white/40 backdrop-blur-xl rounded-3xl shadow-2xl p-6 border border-white/60 hover:shadow-orange-200/50 transition-all duration-300">
+            <h3 className="text-lg font-semibold mb-4 text-gray-700">Key Metrics</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="text-center p-4 rounded-xl bg-green-50/50 backdrop-blur-sm">
+                <div className="text-xs text-gray-600 mb-1">Peak Profit</div>
+                <div className="text-lg font-bold text-green-600">₹{status?.peak_profit?.toLocaleString() || '0'}</div>
+              </div>
+              <div className="text-center p-4 rounded-xl bg-blue-50/50 backdrop-blur-sm">
+                <div className="text-xs text-gray-600 mb-1">Active Loss Floor</div>
+                <div className="text-lg font-bold text-blue-600">₹{status?.active_loss_floor?.toLocaleString() || '0'}</div>
+              </div>
+              <div className="text-center p-4 rounded-xl bg-red-50/50 backdrop-blur-sm">
+                <div className="text-xs text-gray-600 mb-1">Remaining to Max Loss</div>
+                <div className="text-lg font-bold text-red-600">
+                  ₹{((config?.daily_max_loss || 0) - Math.abs(status?.total_pnl || 0) < 0 ? 0 : (config?.daily_max_loss || 0) + (status?.total_pnl || 0)).toLocaleString()}
+                </div>
+              </div>
+              <div className="text-center p-4 rounded-xl bg-purple-50/50 backdrop-blur-sm">
+                <div className="text-xs text-gray-600 mb-1">Last Trade Time</div>
+                <div className="text-sm font-bold text-purple-600">
+                  {status?.last_trade_time 
+                    ? new Date(status.last_trade_time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
+                    : 'N/A'}
+                </div>
+              </div>
             </div>
-            <div className="text-center p-4 rounded-lg bg-green-50">
-              <div className="text-xs text-gray-600 mb-1">Max Profit</div>
-              <div className="text-lg font-bold text-green-600">₹{config?.daily_max_profit?.toLocaleString()}</div>
-            </div>
-            <div className="text-center p-4 rounded-lg bg-orange-50">
-              <div className="text-xs text-gray-600 mb-1">Trades Today</div>
-              <div className="text-lg font-bold text-orange-600">{status?.trades_today || 0} / {config?.max_trades_per_day}</div>
-            </div>
-            <div className="text-center p-4 rounded-lg bg-blue-50">
-              <div className="text-xs text-gray-600 mb-1">Status</div>
-              <div className="text-lg font-bold" style={{ color: status?.max_loss_hit ? '#ef4444' : '#10b981' }}>
-                {status?.max_loss_hit ? 'LOCKED' : status?.in_cooldown ? 'COOLDOWN' : 'ACTIVE'}
+          </div>
+
+          <div className="bg-white/40 backdrop-blur-xl rounded-3xl shadow-2xl p-6 border border-white/60 hover:shadow-orange-200/50 transition-all duration-300">
+            <h3 className="text-lg font-semibold mb-4 text-gray-700">Trading Status</h3>
+            <div className="grid grid-cols-3 gap-4 text-sm">
+              <div className="text-center p-4 rounded-xl bg-blue-50/50 backdrop-blur-sm flex flex-col justify-center min-h-[80px]">
+                <div className="text-xs text-gray-600 mb-2">Status</div>
+                <div className="text-base font-bold leading-tight" style={{ color: status?.max_loss_hit || status?.trip_reason ? '#ef4444' : '#10b981' }}>
+                  {status?.max_loss_hit || status?.trip_reason ? 'TRIPPED' : 'ACTIVE'}
+                </div>
+              </div>
+              <div className="text-center p-4 rounded-xl bg-orange-50/50 backdrop-blur-sm flex flex-col justify-center min-h-[80px]">
+                <div className="text-xs text-gray-600 mb-2">New Orders</div>
+                <div className="text-base font-bold leading-tight break-words" style={{ color: status?.orders_allowed ? '#10b981' : '#ef4444' }}>
+                  {status?.orders_allowed ? 'ALLOWED' : 'NOT ALLOWED'}
+                </div>
+              </div>
+              <div className="text-center p-4 rounded-xl bg-gray-50/50 backdrop-blur-sm flex flex-col justify-center min-h-[80px]">
+                <div className="text-xs text-gray-600 mb-2">Trip Reason</div>
+                <div className="text-sm font-bold text-gray-700 leading-tight break-words">
+                  {status?.trip_reason || '-'}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <Tabs defaultValue="config" className="space-y-6">
-          <TabsList className="bg-gray-100" data-testid="dashboard-tabs">
+          <TabsList className="bg-white/40 backdrop-blur-xl border border-white/60 shadow-lg" data-testid="dashboard-tabs">
             <TabsTrigger value="config" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
               Advanced Config
+            </TabsTrigger>
+            <TabsTrigger value="tradebook" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
+              Tradebook
             </TabsTrigger>
             <TabsTrigger value="logs" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
               Logs
@@ -240,7 +275,7 @@ const Dashboard = () => {
           </TabsList>
 
           <TabsContent value="config" data-testid="config-tab">
-            <Card>
+            <Card className="bg-white/40 backdrop-blur-xl border-white/60 shadow-2xl">
               <CardHeader>
                 <CardTitle>Advanced Risk Configuration</CardTitle>
               </CardHeader>
@@ -281,7 +316,7 @@ const Dashboard = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Trail Step Amount (₹)</Label>
+                    <Label>Cooldown after Profitable Trade (mins)</Label>
                     <Input
                       type="number"
                       value={configForm.trailing_profit_step || ''}
@@ -335,7 +370,7 @@ const Dashboard = () => {
                         checked={configForm.trailing_profit_enabled === true}
                         onCheckedChange={(checked) => setConfigForm(prev => ({...prev, trailing_profit_enabled: checked}))}
                       />
-                      <Label>Enable Trailing Profit</Label>
+                      <Label>Enable Cooldown after Profitable Trade</Label>
                     </div>
                   </div>
                 </div>
@@ -351,8 +386,61 @@ const Dashboard = () => {
             </Card>
           </TabsContent>
 
+          <TabsContent value="tradebook" data-testid="tradebook-tab">
+            <Card className="bg-white/40 backdrop-blur-xl border-white/60 shadow-2xl">
+              <CardHeader>
+                <CardTitle>Trade Book</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  {trades.length === 0 ? (
+                    <p className="text-center text-gray-500 py-8">No trades available</p>
+                  ) : (
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Instrument</th>
+                          <th className="text-center py-3 px-4 font-semibold text-gray-700">Side</th>
+                          <th className="text-center py-3 px-4 font-semibold text-gray-700">Qty</th>
+                          <th className="text-right py-3 px-4 font-semibold text-gray-700">Price</th>
+                          <th className="text-right py-3 px-4 font-semibold text-gray-700">Time</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {trades.map((trade, idx) => (
+                          <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                            <td className="py-3 px-4 text-gray-900 font-medium">{trade.instrument}</td>
+                            <td className="py-3 px-4 text-center">
+                              <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                                trade.side === 'BUY' 
+                                  ? 'bg-green-100 text-green-700' 
+                                  : 'bg-red-100 text-red-700'
+                              }`}>
+                                {trade.side}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-center text-gray-700">{trade.quantity}</td>
+                            <td className="py-3 px-4 text-right text-gray-900 font-medium">₹{trade.price.toFixed(2)}</td>
+                            <td className="py-3 px-4 text-right text-gray-600 text-xs">
+                              {new Date(trade.timestamp).toLocaleTimeString('en-IN', { 
+                                hour: '2-digit', 
+                                minute: '2-digit', 
+                                second: '2-digit',
+                                hour12: false 
+                              })}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="logs" data-testid="logs-tab">
-            <Card>
+            <Card className="bg-white/40 backdrop-blur-xl border-white/60 shadow-2xl">
               <CardHeader>
                 <CardTitle>Activity Logs</CardTitle>
               </CardHeader>

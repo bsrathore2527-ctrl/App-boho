@@ -84,6 +84,10 @@ class RiskStatus(BaseModel):
     cooldown_remaining_minutes: int = Field(default=0)
     violations: List[str] = Field(default_factory=list)
     last_trade_time: Optional[str] = None
+    peak_profit: float = Field(default=0.0, description="Peak profit reached today")
+    active_loss_floor: float = Field(default=0.0, description="Current loss floor (trailing stop)")
+    trip_reason: Optional[str] = Field(default=None, description="Reason for tripping")
+    orders_allowed: bool = Field(default=True, description="Whether new orders are allowed")
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class RiskStatusUpdate(BaseModel):
@@ -101,6 +105,10 @@ class RiskStatusUpdate(BaseModel):
     cooldown_remaining_minutes: Optional[int] = None
     violations: Optional[List[str]] = None
     last_trade_time: Optional[str] = None
+    peak_profit: Optional[float] = None
+    active_loss_floor: Optional[float] = None
+    trip_reason: Optional[str] = None
+    orders_allowed: Optional[bool] = None
 
 class KVStateUpdate(BaseModel):
     """Model to accept KV state data from external system"""
@@ -120,6 +128,26 @@ class LogEntryCreate(BaseModel):
     type: LogType
     message: str
     details: Optional[Dict[str, Any]] = None
+
+class Trade(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: Optional[str] = None
+    timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    instrument: str = Field(description="Trading instrument symbol")
+    side: str = Field(description="BUY or SELL")
+    quantity: int = Field(description="Trade quantity")
+    price: float = Field(description="Trade price")
+    order_id: Optional[str] = None
+    status: str = Field(default="executed")
+
+class TradeCreate(BaseModel):
+    instrument: str
+    side: str
+    quantity: int
+    price: float
+    order_id: Optional[str] = None
+    status: str = "executed"
 
 # Routes
 @api_router.get("/")
@@ -205,7 +233,17 @@ async def update_risk_status(status_update: RiskStatusUpdate):
 
 @api_router.post("/risk-status/reset")
 async def reset_risk_status():
-    default_status = RiskStatus(id="current_status")
+    # Create status with mock data for demonstration
+    default_status = RiskStatus(
+        id="current_status",
+        realised=600.0,
+        unrealised=400.0,
+        total_pnl=1000.0,
+        peak_profit=1500.0,
+        active_loss_floor=500.0,
+        orders_allowed=True,
+        last_trade_time=datetime.now(timezone.utc).isoformat()
+    )
     await db.risk_status.update_one(
         {"id": "current_status"},
         {"$set": default_status.model_dump()},
@@ -218,6 +256,21 @@ async def reset_risk_status():
         message="Risk status reset to default"
     )
     await db.logs.insert_one(log_entry.model_dump())
+    
+    # Add some sample trades if none exist
+    trade_count = await db.trades.count_documents({})
+    if trade_count == 0:
+        sample_trades = [
+            Trade(instrument="NIFTY25D09257700PE", side="BUY", quantity=75, price=3.15, timestamp=(datetime.now(timezone.utc).replace(hour=13, minute=1, second=41)).isoformat()),
+            Trade(instrument="NIFTY25D16256600PE", side="BUY", quantity=75, price=17.7, timestamp=(datetime.now(timezone.utc).replace(hour=11, minute=46, second=41)).isoformat()),
+            Trade(instrument="NIFTY25D16256600PE", side="SELL", quantity=75, price=17.4, timestamp=(datetime.now(timezone.utc).replace(hour=11, minute=34, second=33)).isoformat()),
+            Trade(instrument="NIFTY25D16256600PE", side="BUY", quantity=75, price=17.45, timestamp=(datetime.now(timezone.utc).replace(hour=11, minute=34, second=28)).isoformat()),
+            Trade(instrument="NIFTY25D16256600PE", side="SELL", quantity=75, price=16.7, timestamp=(datetime.now(timezone.utc).replace(hour=10, minute=34, second=33)).isoformat()),
+            Trade(instrument="NIFTY25D16256600PE", side="BUY", quantity=75, price=15.8, timestamp=(datetime.now(timezone.utc).replace(hour=10, minute=23, second=7)).isoformat()),
+            Trade(instrument="NIFTY25D16256600PE", side="SELL", quantity=75, price=15.6, timestamp=(datetime.now(timezone.utc).replace(hour=10, minute=15, second=34)).isoformat()),
+            Trade(instrument="NIFTY25D16256600PE", side="BUY", quantity=75, price=13.65, timestamp=(datetime.now(timezone.utc).replace(hour=9, minute=15, second=23)).isoformat()),
+        ]
+        await db.trades.insert_many([trade.model_dump() for trade in sample_trades])
     
     return {"message": "Risk status reset successfully"}
 
@@ -305,6 +358,23 @@ async def create_log(log_create: LogEntryCreate):
 async def clear_logs():
     result = await db.logs.delete_many({})
     return {"message": f"Deleted {result.deleted_count} log entries"}
+
+# Trades Endpoints
+@api_router.get("/trades", response_model=List[Trade])
+async def get_trades(limit: int = 100):
+    trades = await db.trades.find({}, {"_id": 0}).sort("timestamp", -1).limit(limit).to_list(limit)
+    return [Trade(**trade) for trade in trades]
+
+@api_router.post("/trades", response_model=Trade)
+async def create_trade(trade_create: TradeCreate):
+    trade_entry = Trade(**trade_create.model_dump())
+    await db.trades.insert_one(trade_entry.model_dump())
+    return trade_entry
+
+@api_router.delete("/trades")
+async def clear_trades():
+    result = await db.trades.delete_many({})
+    return {"message": f"Deleted {result.deleted_count} trade entries"}
 
 # Include the router in the main app
 app.include_router(api_router)
